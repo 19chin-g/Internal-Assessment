@@ -1,55 +1,31 @@
 import java.io.*;
+import java.util.List;
 
 public class Database {
     private String filename;
 
-    // Constructor to initialize the filename
     public Database(String filename) {
         this.filename = filename;
     }
-    public boolean checkUsername(String username) { // Method to check for same username
+
+    public String[] readRecord(int recordNum) { // Method to read one line in record
         try {
             FileReader fr = new FileReader(filename);
-            BufferedReader r = new BufferedReader(fr);
+            BufferedReader br = new BufferedReader(fr);
             String line = "";
-            line = r.readLine();
-            while (line != null) {
-                String[] record = line.split(" ");
-                if (record[0].equals(username))   {
-                    return true;
+            int i = 0;
+            while (i <= recordNum && (line = br.readLine()) != null) {
+                if(i == recordNum) {
+                    return line.split(" "); // returns with each record item in a list
                 }
-                line = r.readLine();
-
+                i++;
             }
-            r.close();
+            br.close();
 
         } catch (IOException e) {
             System.out.println("error reading");
         }
-        return false;
-    }
-
-    // Method to check if a user with the given username and password exists
-    public boolean findUser(String username, String password) {
-        try {
-            FileReader fr = new FileReader(filename);
-            BufferedReader r = new BufferedReader(fr);
-            String line = "";
-            line = r.readLine();
-            while (line != null) {
-                String[] record = line.split(" "); // Split the line into username and password
-                if (record[0].equals(username) && record[1].equals(password)) {
-                    return true;
-                }
-                line = r.readLine();
-
-            }
-            r.close();
-
-        } catch (IOException e) {
-            System.out.println("error reading");
-        }
-        return false;
+        return null;
     }
 
     // Method to write a new user to the file

@@ -1,5 +1,10 @@
 import java.util.Scanner;
 
+/* users.txt format:
+username1 password1
+username2 password2
+ */
+
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -23,9 +28,15 @@ public class Main {
             } else if (choice.equals("3")) {
                 exit = true;
             } else {
-                System.out.println("Invalid choice, try again");
+                System.out.print("Invalid choice. ");
             }
 
         }
+
+        Calendar calendar = new Calendar();
+        calendar.displayCurrentDate();
+        calendar.displayCurrentTime();
+        calendar.displayCalendar();
+
     }
 }

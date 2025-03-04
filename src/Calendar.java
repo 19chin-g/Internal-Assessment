@@ -1,34 +1,71 @@
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.time.DayOfWeek;
-import java.time.YearMonth;
-
 
 public class Calendar {
+    int month;
+    int year;
+
+    public Calendar(int month, int year) {
+        this.month = month;
+        this.year = year;
+    }
+
+    public void displayCalendar() {
+        LocalDate today = LocalDate.now();
+        LocalDate firstDay = LocalDate.of(year, month, 1); //first day of the month
+        int monthLength = firstDay.lengthOfMonth();
+        int startDay = (firstDay.getDayOfWeek().getValue());
+
+        System.out.println(firstDay.getMonth() + " " + year);
+        System.out.println("Mon  Tue  Wed  Thu  Fri  Sat  Sun");
+
+        // Print spaces before the first day
+        for (int i = 1; i < startDay; i++) {
+            System.out.print("     ");
+        }
+
+        // Print days
+        for (int day = 1; day <= monthLength; day++) {
+            if (day == today.getDayOfMonth() && today.getMonthValue() == month && today.getYear() == year) {
+                System.out.printf("(%2d) ", day); // Highlight today
+            } else {
+                System.out.printf(" %2d  ", day);
+            }
+
+            if ((day + startDay) % 7 == 1) {
+                System.out.println(); // New line every week
+            }
+        }
+        System.out.println();
+    }
+
+    public void prevMonth() {
+        if (month == 1) {
+            month = 12;
+            year--;
+        } else {
+            month--;
+        }
+    }
+
+    public void nextMonth() {
+        if (month == 12) {
+            month = 1;
+            year++;
+        } else {
+            month++;
+        }
+    }
 
     public void displayCurrentDate() {
-        LocalDateTime date = LocalDateTime.now();
+        LocalDate date = LocalDate.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, dd MMMM yyyy");
         System.out.println(date.format(formatter));
     }
-    public void displayCurrentTime() {
-        LocalDateTime date = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-        System.out.println(date.format(formatter));
-    }
-    public void displayCalendar() {
-        LocalDate today = LocalDate.now();
-        System.out.println(today);
-        YearMonth month = YearMonth.now();
-        System.out.println(month);
-        int daysInMonth = month.lengthOfMonth();
-        System.out.println(daysInMonth);
-        LocalDate firstDay = month.atDay(1);
-        System.out.println(firstDay);
-        DayOfWeek startDay = firstDay.getDayOfWeek();
-        System.out.println(startDay);
-    }
 
+    public void displayCurrentTime() {
+        LocalDateTime time = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        System.out.println(time.format(formatter));
+    }
 }

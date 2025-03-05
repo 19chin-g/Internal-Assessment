@@ -2,7 +2,7 @@ import java.io.*;
 import java.util.List;
 
 public class Database {
-    private String filename;
+    private final String filename;
 
     public Database(String filename) {
         this.filename = filename;

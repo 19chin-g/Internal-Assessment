@@ -1,11 +1,3 @@
-user123 password1
-testUser pass1234
-admin adminPass
-john_doe qwerty123
-guest letmein
-player1 gaming2024
-helloWorld javaRocks
-coolDude coolPass
-alpha bravo123
-charlie delta456
-assdfassdfasdf asssdfsasdfsasdfs
+bob 123
+gen 321
+john banana

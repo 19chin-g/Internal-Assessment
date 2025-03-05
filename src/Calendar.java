@@ -5,6 +5,13 @@ public class Calendar {
     int month;
     int year;
 
+    String RESET = "\u001B[0m";
+    String RED = "\u001B[31m";
+    String GREEN = "\u001B[32m";
+    String YELLOW = "\u001B[33m";
+    String BLACK = "\u001B[30m";
+    String WHITE_BG = "\u001B[47m";
+
     public Calendar(int month, int year) {
         this.month = month;
         this.year = year;
@@ -27,7 +34,7 @@ public class Calendar {
         // Print days
         for (int day = 1; day <= monthLength; day++) {
             if (day == today.getDayOfMonth() && today.getMonthValue() == month && today.getYear() == year) {
-                System.out.printf("(%2d) ", day); // Highlight today
+                System.out.print("  " + BLACK + WHITE_BG + day +  RESET + "  "); // Highlight today
             } else {
                 System.out.printf(" %2d  ", day);
             }

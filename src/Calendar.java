@@ -6,13 +6,13 @@ public class Calendar {
     int month;
     int year;
 
-    String RESET = "\u001B[0m";
-    String RED = "\u001B[31m";
-    String GREEN = "\u001B[32m";
-    String YELLOW = "\u001B[33m";
-    String CYAN = "\033[0;36m";
-    String BLACK = "\u001B[30m";
-    String WHITE_BG = "\u001B[47m";
+    public static final String RESET = "\033[0m";  // Reset all styles
+    public static final String BOLD_ITALIC = "\033[1;3m"; // Bold + Italic
+    public static final String BOLD = "\033[0;1m"; // Bold + Italic
+
+    public static final String BLUE = "\033[34;5;196m"; // Red color
+
+
 
     public Calendar(int month, int year) {
         this.month = month;
@@ -21,45 +21,63 @@ public class Calendar {
 
     public void displayCalendar() {
 
+        LocalDate today = LocalDate.now();
+        LocalDate firstDay = LocalDate.of(year, month, 1); //first day of the month
+        int monthLength = firstDay.lengthOfMonth();
+        int startDay = (firstDay.getDayOfWeek().getValue());
+        ArrayList<ArrayList<Integer>> monthList = createCalendar();
+
+        System.out.println(BOLD + BLUE + today.getDayOfWeek() + " " + today.getDayOfWeek().getValue() + " " + firstDay.getMonth() + RESET);
+        System.out.println(BOLD + firstDay.getMonth() + " " + year + RESET);
+
+        System.out.println(BOLD + "Mon  Tue  Wed  Thu  Fri  Sat  Sun" + RESET);
+
+
+        for (ArrayList<Integer> integers : monthList) {
+            for (Integer integer : integers) {
+                if (integer == null) {
+                    System.out.print("     ");
+                } else if (integer == today.getDayOfMonth() && today.getMonthValue() == month && today.getYear() == year) {
+                    System.out.printf("%s%s[%2d]%s ", BOLD_ITALIC, BLUE, integer, RESET); // Bold, italic, red
+                } else {
+                    System.out.printf(" %2d  ", integer);
+                }
+            }
+            System.out.println();
+        }
+    }
+
+    public ArrayList<ArrayList<Integer>> createCalendar() {
+
         // sets up 2D arraylist with max 6 rows for each week
         ArrayList<ArrayList<Integer>> monthList = new ArrayList<>();
         for(int rows = 0; rows < 6; rows++) {
             monthList.addFirst(new ArrayList<Integer>());
         }
-        
+
         LocalDate today = LocalDate.now();
         LocalDate firstDay = LocalDate.of(year, month, 1); //first day of the month
         int monthLength = firstDay.lengthOfMonth();
         int startDay = (firstDay.getDayOfWeek().getValue());
 
-        System.out.println(CYAN + firstDay.getDayOfWeek().getValue() + " " + firstDay.getMonth() + " " + year + RESET);
-        System.out.println("Mon  Tue  Wed  Thu  Fri  Sat  Sun");
-
-        // Print spaces before the first day
+        // Add spaces before the first day of month
         for (int i = 1; i < startDay; i++) {
-            System.out.print("     ");
-            monthList.get(0).add(null);
+            monthList.getFirst().add(null);
         }
 
         // Print days
         int nextList = 0;
         for (int day = 1; day <= monthLength; day++) {
-            if (day == today.getDayOfMonth() && today.getMonthValue() == month && today.getYear() == year) {
-                System.out.print("  " + BLACK + WHITE_BG + day +  RESET + "  "); // Highlight today
-            } else {
-                System.out.printf(" %2d  ", day);
-            }
             monthList.get(nextList).add(day);
-
             if ((day + startDay) % 7 == 1) {
-                System.out.println(); // New line every week
                 nextList++;
             }
         }
-        System.out.println();
-        System.out.println(monthList);
+        return monthList;
 
     }
+
+
 
     public void prevMonth() {
         if (month == 1) {

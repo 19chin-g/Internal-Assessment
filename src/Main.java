@@ -41,6 +41,7 @@ public class Main {
 
         System.out.println();
         System.out.println("============CALENDAR===========");
+
         calendar.displayCalendar();
 
         System.out.println("1) Previous month");
@@ -59,7 +60,7 @@ public class Main {
                 case "2" -> { calendar.nextMonth(); calendar.displayCalendar(); }
                 case "3" -> exit = true;
 
-                default -> System.out.println("Invalid choice. ");
+                default -> System.out.print("Invalid choice. ");
             }
 
         }

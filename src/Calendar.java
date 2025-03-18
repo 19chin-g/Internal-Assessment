@@ -23,8 +23,7 @@ public class Calendar {
 
         LocalDate today = LocalDate.now();
         LocalDate firstDay = LocalDate.of(year, month, 1); //first day of the month
-        int monthLength = firstDay.lengthOfMonth();
-        int startDay = (firstDay.getDayOfWeek().getValue());
+
         ArrayList<ArrayList<Integer>> monthList = createCalendar();
 
         System.out.println(BOLD + BLUE + today.getDayOfWeek() + " " + today.getDayOfWeek().getValue() + " " + firstDay.getMonth() + RESET);

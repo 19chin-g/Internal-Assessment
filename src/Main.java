@@ -41,12 +41,12 @@ public class Main {
 
         System.out.println();
         System.out.println("============CALENDAR===========");
-
         calendar.displayCalendar();
 
         System.out.println("1) Previous month");
         System.out.println("2) Next month");
-        System.out.println("3) Exit");
+        System.out.println("3) Set task");
+        System.out.println("4) Exit");
 
 
         while (!exit) {
@@ -58,9 +58,9 @@ public class Main {
             switch (choice) {
                 case "1" -> { calendar.prevMonth(); calendar.displayCalendar(); }
                 case "2" -> { calendar.nextMonth(); calendar.displayCalendar(); }
-                case "3" -> exit = true;
+                case "4" -> exit = true;
 
-                default -> System.out.print("Invalid choice. ");
+                default -> System.out.println("Invalid choice. ");
             }
 
         }

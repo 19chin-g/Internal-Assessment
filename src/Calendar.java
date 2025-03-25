@@ -51,8 +51,6 @@ public class Calendar {
                 nextList++; // Move to next list in 2D array
             }
         }
-        System.out.println();
-        System.out.println(monthList);
         return monthList;
 
     }
@@ -61,10 +59,12 @@ public class Calendar {
     public void displayCalendar() {
         ArrayList<ArrayList<Integer>> monthList = createCalendar();
 
-        LocalDate today = LocalDate.now();
-        LocalDate firstDay = LocalDate.of(year, month, 1); //first day of the month
-        int monthLength = firstDay.lengthOfMonth();
-        int startDay = (firstDay.getDayOfWeek().getValue());
+        LocalDate today = LocalDate.now(); // current date
+        LocalDate firstDay = LocalDate.of(year, month, 1); // first day of the month
+        int currentMonth = today.getMonthValue();
+        int currentYear = today.getYear();
+        int currentDay = today.getDayOfMonth();
+
 
         if (firstDay.getMonth().getValue() == today.getMonth().getValue()) {
             System.out.println(CYAN + firstDay.getDayOfWeek().getValue() + " " + firstDay.getMonth() + " " + year + RESET);
@@ -79,7 +79,7 @@ public class Calendar {
             for (int day = 0; day < monthList.get(week).size(); day++) {
                 if (monthList.get(week).get(day) == null) {
                     System.out.print("     ");
-                } else if (monthList.get(week).get(day) == today.getDayOfMonth() && today.getMonthValue() == month && today.getYear() == year) {
+                } else if (monthList.get(week).get(day) == currentDay && currentMonth == month && currentYear == year) {
                         System.out.print(" " + BLACK + WHITE_BG + monthList.get(week).get(day) +  RESET + "  "); // Highlight today
                 } else {
                     System.out.printf(" %2d  ", monthList.get(week).get(day)); // Otherwise display normally
@@ -89,19 +89,6 @@ public class Calendar {
 
         }
 
-        /*
-        int nextList = 0;
-        for (int day = 1; day <= monthLength; day++) {
-            if (day == today.getDayOfMonth() && today.getMonthValue() == month && today.getYear() == year) {
-                System.out.print(" " + BLACK + WHITE_BG + day +  RESET + "  "); // Highlight today
-            } else {
-                System.out.printf(" %2d  ", day); // Otherwise display normally
-            }
-
-            if ((day + startDay) % 7 == 1) {
-                System.out.println(); // New line every week
-            }
-        }*/
 
     }
 
@@ -121,6 +108,10 @@ public class Calendar {
         } else {
             month++;
         }
+    }
+
+    public void addTask(int day, int month, int year, String info) {
+
     }
 
     public void displayCurrentDate() {

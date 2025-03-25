@@ -48,7 +48,7 @@ public class Login {
 
         if (findUser(username, password)) {
             System.out.println("Login successful!");
-            System.out.println(userID);
+            System.out.println("User ID: " + userID);
             return true;
         } else {
             System.out.println("Invalid username or password.");
@@ -83,6 +83,10 @@ public class Login {
         User newUser = new User(username, password);
         database.addUser(newUser);
         System.out.println("User registered successfully.");
+    }
+
+    public int getUserID() {
+        return userID;
     }
 
 }

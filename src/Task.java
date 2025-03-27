@@ -1,30 +1,32 @@
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Scanner;
 
-import static javax.swing.UIManager.getInt;
-
-public class Task{
-    int day;
-    int month;
-    int year;
+public class Task {
+    LocalDate date; // Store date as LocalDate
     int type;
     String info;
-
 
     public Task() {
     }
 
     public void addTask() {
         Scanner scanner = new Scanner(System.in);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yy");
 
-        System.out.print("Enter date in DD/MM/YY format: ");
-        String date = scanner.nextLine().trim();
-        day = Integer.parseInt(Character.toString(date.charAt(0)) +  Character.toString((date.charAt(1))));
-        month = Integer.parseInt(Character.toString(date.charAt(3)) +  Character.toString((date.charAt(4))));
-        year = Integer.parseInt(Character.toString(date.charAt(6)) +  Character.toString((date.charAt(7))));
+        while (true) {
+            System.out.print("Enter date in DD/MM/YY format: ");
+            String dateString = scanner.nextLine().trim();
 
-        System.out.println(day);
-        System.out.println(month);
-        System.out.println(year);
+            try {
+                date = LocalDate.parse(dateString, formatter);
+                System.out.println("Date stored: " + date);
+                break;
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid date format! Please enter a valid date (DD/MM/YY).");
+            }
+        }
 
         System.out.println("1) Academic");
         System.out.println("2) Social & Personal");
@@ -32,8 +34,6 @@ public class Task{
         System.out.print("Enter task type: ");
         type = Integer.parseInt(scanner.nextLine().trim());
 
-        System.out.println(type);
-
+        System.out.println("Task type: " + type);
     }
-
 }

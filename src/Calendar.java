@@ -15,16 +15,13 @@ public class Calendar {
     String BLACK = "\u001B[30m";
     String WHITE_BG = "\u001B[47m";
 
-    public Calendar(int month, int year) {
-        this.month = month;
-        this.year = year;
-    }
-
     public Calendar(int day, int month, int year) {
         this.day = day;
         this.month = month;
         this.year = year;
     }
+
+
     public ArrayList<ArrayList<Integer>> createCalendar() {
         // sets up 2D arraylist with max 6 rows for each week
         ArrayList<ArrayList<Integer>> monthList = new ArrayList<>();
@@ -33,9 +30,11 @@ public class Calendar {
         }
 
         LocalDate today = LocalDate.now();
-        LocalDate firstDay = LocalDate.of(year, month, 1); //first day of the month
-        int monthLength = firstDay.lengthOfMonth();
-        int startDay = (firstDay.getDayOfWeek().getValue());
+        System.out.println(today);
+        LocalDate selectedMonth = LocalDate.of(year, month, day); // first day of the month
+        System.out.println(selectedMonth);
+        int monthLength = selectedMonth.lengthOfMonth();
+        int startDay = selectedMonth.getDayOfWeek().getValue();
 
         // Add null to represent spaces before the first day
         for (int i = 1; i < startDay; i++) {
@@ -57,19 +56,19 @@ public class Calendar {
 
 
     public void displayCalendar() {
-        ArrayList<ArrayList<Integer>> monthList = createCalendar();
+        ArrayList<ArrayList<Integer>> monthList = createCalendar(); // creates 2D array month list
 
         LocalDate today = LocalDate.now(); // current date
-        LocalDate firstDay = LocalDate.of(year, month, 1); // first day of the month
+        LocalDate selectedMonth = LocalDate.of(year, month, day);
         int currentMonth = today.getMonthValue();
         int currentYear = today.getYear();
         int currentDay = today.getDayOfMonth();
+        System.out.println(day);
 
-
-        if (firstDay.getMonth().getValue() == today.getMonth().getValue()) {
-            System.out.println(CYAN + firstDay.getDayOfWeek().getValue() + " " + firstDay.getMonth() + " " + year + RESET);
+        if (selectedMonth.getMonthValue() == currentMonth && year == currentYear) {
+            System.out.println(CYAN + day + " " + selectedMonth.getMonth() + " " + year + RESET);
         } else {
-            System.out.println(CYAN + firstDay.getMonth() + " " + year + RESET);
+            System.out.println(CYAN + selectedMonth.getMonth() + " " + year + RESET);
 
         }
         System.out.println("Mon  Tue  Wed  Thu  Fri  Sat  Sun");

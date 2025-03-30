@@ -35,8 +35,7 @@ public class Main {
 
 
         LocalDate today = LocalDate.now();
-        Calendar calendar = new Calendar(today.getMonthValue(), today.getYear());
-
+        Calendar calendar = new Calendar(today.getDayOfMonth(), today.getMonthValue(), today.getYear());
 
         System.out.println();
         System.out.println("============CALENDAR===========");

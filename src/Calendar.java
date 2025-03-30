@@ -15,10 +15,6 @@ public class Calendar {
     String BLACK = "\u001B[30m";
     String WHITE_BG = "\u001B[47m";
 
-    public Calendar(int month, int year) {
-        this.month = month;
-        this.year = year;
-    }
 
     public Calendar(int day, int month, int year) {
         this.day = day;
@@ -33,9 +29,9 @@ public class Calendar {
         }
 
         LocalDate today = LocalDate.now();
-        LocalDate firstDay = LocalDate.of(year, month, 1); //first day of the month
-        int monthLength = firstDay.lengthOfMonth();
-        int startDay = (firstDay.getDayOfWeek().getValue());
+        LocalDate selectedMonth = LocalDate.of(year, month, 1);
+        int monthLength = selectedMonth.lengthOfMonth();
+        int startDay = selectedMonth.getDayOfWeek().getValue();
 
         // Add null to represent spaces before the first day
         for (int i = 1; i < startDay; i++) {
@@ -51,6 +47,8 @@ public class Calendar {
                 nextList++; // Move to next list in 2D array
             }
         }
+
+        System.out.println(monthList);
         return monthList;
 
     }
@@ -60,16 +58,16 @@ public class Calendar {
         ArrayList<ArrayList<Integer>> monthList = createCalendar();
 
         LocalDate today = LocalDate.now(); // current date
-        LocalDate firstDay = LocalDate.of(year, month, 1); // first day of the month
+        LocalDate selectedMonth = LocalDate.of(year, month, 1);
         int currentMonth = today.getMonthValue();
         int currentYear = today.getYear();
         int currentDay = today.getDayOfMonth();
 
 
-        if (firstDay.getMonth().getValue() == today.getMonth().getValue()) {
-            System.out.println(CYAN + firstDay.getDayOfWeek().getValue() + " " + firstDay.getMonth() + " " + year + RESET);
+        if (selectedMonth.getMonthValue() == currentMonth && year == currentYear) {
+            System.out.println(CYAN + day + " " + selectedMonth.getMonth() + " " + year + RESET);
         } else {
-            System.out.println(CYAN + firstDay.getMonth() + " " + year + RESET);
+            System.out.println(CYAN + selectedMonth.getMonth() + " " + year + RESET);
 
         }
         System.out.println("Mon  Tue  Wed  Thu  Fri  Sat  Sun");
@@ -99,6 +97,7 @@ public class Calendar {
         } else {
             month--;
         }
+        // Adjust the day to fit within the new month's length
     }
 
     public void nextMonth() {
@@ -108,6 +107,7 @@ public class Calendar {
         } else {
             month++;
         }
+        // Adjust the day to fit within the new month's length
     }
 
     public void addTask(int day, int month, int year, String info) {

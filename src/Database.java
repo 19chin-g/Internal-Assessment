@@ -40,4 +40,27 @@ public class Database {
             System.out.println("error writing");
         }
     }
+
+    public void removeRecord(int recordNum) {
+        try {
+            FileReader fr = new FileReader(filename);
+            BufferedReader br = new BufferedReader(fr);
+            FileWriter fw = new FileWriter(filename, true);
+            BufferedWriter writer = new BufferedWriter(fw);
+
+
+            String line = "";
+            int i = 0;
+            while (i <= recordNum && (line = br.readLine()) != null) {
+                if(i == recordNum) {
+                    String target = br.readLine();
+                }
+                i++;
+            }
+            br.close();
+
+        } catch (IOException e) {
+            System.out.println("error reading");
+        }
+    }
 }

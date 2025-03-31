@@ -11,7 +11,6 @@ public class Login {
     String DARK_RED = "\033[0;31m";
 
 
-
     public Login(String filename) {
         loginFile = new Database(filename);
     }

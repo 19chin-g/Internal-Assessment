@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 
-public class Calendar {
+public class TaskCalendar {
     int day;
     int month;
     int year;
@@ -24,7 +24,7 @@ public class Calendar {
     String LIGHT_GRAY = "\033[0;37m"; // Light Gray (Bright White)
 
 
-    public Calendar(int day, int month, int year) {
+    public TaskCalendar(int day, int month, int year) {
         this.day = day;
         this.month = month;
         this.year = year;
@@ -116,7 +116,7 @@ public class Calendar {
     public void addTask() {
         Scanner scanner = new Scanner(System.in);
 
-        LocalDate taskDate =  null;
+        LocalDate taskDate = null;
         String taskType = "";
 
         System.out.println(BOLD + YELLOW + "======== TASK CREATION ========" + RESET);
@@ -134,7 +134,7 @@ public class Calendar {
             }
         }
 
-        boolean exit  = false;
+        boolean exit = false;
 
         while (!exit) {
             // Prompt for task type and information
@@ -147,9 +147,18 @@ public class Calendar {
             String choice = scanner.nextLine().trim();
 
             switch (choice) {
-                case "1" -> { taskType = "Academic"; exit = true; }
-                case "2" -> { taskType = "Social & Personal"; exit = true; }
-                case "3" -> { taskType = "Health & Wellbeing"; exit = true; }
+                case "1" -> {
+                    taskType = "Academic";
+                    exit = true;
+                }
+                case "2" -> {
+                    taskType = "Social & Personal";
+                    exit = true;
+                }
+                case "3" -> {
+                    taskType = "Health & Wellbeing";
+                    exit = true;
+                }
                 default -> System.out.print(DARK_RED + "Invalid choice. " + RESET);
             }
         }
@@ -165,44 +174,40 @@ public class Calendar {
     }
 
     public void saveTaskToFile(LocalDate date, String type, String info) {
-        writer.write(date.format(DateTimeFormatter.ofPattern("d/M/yy")) + "," + type + "," + info);
-        writer.newLine();  // Move to next line
-    } catch (IOException e) {
-        System.out.println(RED + "Error saving task!" + RESET);
+
+    }
+
+
+    // Navigate to previous or next month
+    public void prevMonth() {
+        if (month == 1) {
+            month = 12;
+            year--;
+        } else {
+            month--;
+        }
+    }
+
+    public void nextMonth() {
+        if (month == 12) {
+            month = 1;
+            year++;
+        } else {
+            month++;
+        }
+    }
+
+    // Display current date and time
+    public void displayCurrentDate() {
+        LocalDate date = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, dd MMMM yyyy");
+        System.out.println(date.format(formatter));
+    }
+
+    public void displayCurrentTime() {
+        LocalDateTime time = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        System.out.println(time.format(formatter));
     }
 }
 
-
-
-// Navigate to previous or next month
-public void prevMonth() {
-    if (month == 1) {
-        month = 12;
-        year--;
-    } else {
-        month--;
-    }
-}
-
-public void nextMonth() {
-    if (month == 12) {
-        month = 1;
-        year++;
-    } else {
-        month++;
-    }
-}
-
-// Display current date and time
-public void displayCurrentDate() {
-    LocalDate date = LocalDate.now();
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, dd MMMM yyyy");
-    System.out.println(date.format(formatter));
-}
-
-public void displayCurrentTime() {
-    LocalDateTime time = LocalDateTime.now();
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-    System.out.println(time.format(formatter));
-}
-}

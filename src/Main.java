@@ -1,5 +1,4 @@
 import java.time.LocalDate;
-import java.util.Calendar;
 import java.util.Scanner;
 
 /* users.txt format:
@@ -40,7 +39,7 @@ public class Main {
 
 
         LocalDate today = LocalDate.now();
-        Calendar calendar = new Calendar(today.getDayOfMonth(), today.getMonthValue(), today.getYear()) {
+        TaskCalendar calendar = new TaskCalendar(today.getDayOfMonth(), today.getMonthValue(), today.getYear()) {
         };
 
         System.out.println();

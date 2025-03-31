@@ -23,7 +23,7 @@ public class Main {
 
             System.out.print("Choose an option: ");
 
-            String choice = scanner.nextLine();
+            String choice = scanner.nextLine().trim();
             switch (choice) {
                 case "1" -> exit = user.login(); // log in
                 case "2" -> user.register(); // register new user
@@ -45,7 +45,6 @@ public class Main {
         System.out.println("2) Next month");
         System.out.println("3) Set task");
         System.out.println("4) Exit");
-        Task task = new Task();
 
 
 
@@ -53,12 +52,12 @@ public class Main {
 
             System.out.print("Choose an option: ");
 
-            String choice = scanner.nextLine();
+            String choice = scanner.nextLine().trim();
 
             switch (choice) {
                 case "1" -> { calendar.prevMonth(); calendar.displayCalendar(); }
                 case "2" -> { calendar.nextMonth(); calendar.displayCalendar(); }
-                case "3" -> { task.addTask(); }
+                case "3" -> { calendar.addTask(); }
                 case "4" -> exit = true;
 
                 default -> System.out.println("Invalid choice. ");

@@ -1,4 +1,5 @@
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Database {
@@ -8,59 +9,91 @@ public class Database {
         this.filename = filename;
     }
 
-    public String[] readRecord(int recordNum) { // Method to read one line in record
+    public String[] readRecord(int recordNum) {
         try {
-            FileReader fr = new FileReader(filename);
-            BufferedReader br = new BufferedReader(fr);
-            String line = "";
+            BufferedReader reader = new BufferedReader(new FileReader(filename));
+            String line;
             int i = 0;
-            while (i <= recordNum && (line = br.readLine()) != null) {
-                if(i == recordNum) {
-                    return line.split(" "); // returns with each record item in a list
+            while ((line = reader.readLine()) != null) {
+                if (i == recordNum) {
+                    reader.close();
+                    return line.split(" ");
                 }
                 i++;
             }
-            br.close();
-
+            reader.close();
         } catch (IOException e) {
-            System.out.println("error reading");
+            System.out.println("error");
         }
         return null;
     }
 
-    // Method to write a new user to the file
+
+    public List<String> readAllRecords() {
+        List<String> records = new ArrayList<>();
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(filename));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                records.add(line);
+            }
+            reader.close();
+        } catch (IOException e) {
+            System.out.println("error");
+        }
+        return records;
+    }
+
+
+    public void writeRecord(int recordNum, String data) {
+        List<String> records = readAllRecords();
+
+        if (recordNum < 0 || recordNum >= records.size()) {
+            System.out.println("Invalid record number!");
+            return;
+        }
+        records.set(recordNum, data);
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
+            for (int i = 0; i < records.size(); i++) {
+                writer.write(records.get(i));
+                writer.newLine();
+            }
+            writer.close();
+        } catch (IOException e) {
+            System.out.println("error ");
+        }
+    }
+
+
     public void addUser(User user) {
         try {
-            FileWriter fw = new FileWriter(filename, true);
-            BufferedWriter writer = new BufferedWriter(fw);
+            BufferedWriter writer = new BufferedWriter(new FileWriter(filename, true));
             writer.write(user.toString());
             writer.newLine();
             writer.close();
         } catch (IOException e) {
-            System.out.println("error writing");
+            System.out.println("erroor");
         }
     }
 
+
     public void removeRecord(int recordNum) {
+        List<String> records = readAllRecords();
+        if (recordNum < 0 || recordNum >= records.size()) {
+            System.out.println("Invalid record number!");
+            return;
+        }
+        records.remove(recordNum); // Removes record
         try {
-            FileReader fr = new FileReader(filename);
-            BufferedReader br = new BufferedReader(fr);
-            FileWriter fw = new FileWriter(filename, true);
-            BufferedWriter writer = new BufferedWriter(fw);
-
-
-            String line = "";
-            int i = 0;
-            while (i <= recordNum && (line = br.readLine()) != null) {
-                if(i == recordNum) {
-                    String target = br.readLine();
-                }
-                i++;
+            BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
+            for (int i = 0; i < records.size(); i++) {
+                writer.write(records.get(i));
+                writer.newLine();
             }
-            br.close();
-
+            writer.close();
         } catch (IOException e) {
-            System.out.println("error reading");
+            System.out.println("eroor");
         }
     }
 }

@@ -8,16 +8,21 @@ public class Calendar {
     int day;
     int month;
     int year;
+    Database taskFile;
 
     List<Task> tasks = new ArrayList<>();  // Store tasks in a list
 
+    //COLOURS
     String RESET = "\u001B[0m";
-    String RED = "\u001B[31m";
+    String DARK_RED = "\033[0;31m";
     String GREEN = "\u001B[32m";
     String YELLOW = "\u001B[33m";
     String CYAN = "\033[0;36m";
     String BLACK = "\u001B[30m";
     String WHITE_BG = "\u001B[47m";
+    String BOLD = "\033[1m";  // Bold
+    String LIGHT_GRAY = "\033[0;37m"; // Light Gray (Bright White)
+
 
     public Calendar(int day, int month, int year) {
         this.day = day;
@@ -60,6 +65,9 @@ public class Calendar {
         int currentMonth = today.getMonthValue();
         int currentYear = today.getYear();
 
+        System.out.println(BOLD + "============ CALENDAR ============" + RESET);
+
+        // prints full date with day if on current month otherwise display month and year only
         if (selectedMonth.getMonthValue() == currentMonth && year == currentYear) {
             System.out.println(CYAN + day + " " + selectedMonth.getMonth() + " " + year + RESET);
         } else {
@@ -69,22 +77,28 @@ public class Calendar {
         System.out.println("Mon  Tue  Wed  Thu  Fri  Sat  Sun");
 
         for (int week = 0; week < monthList.size(); week++) {
-            for (int d = 0; d < monthList.get(week).size(); d++) {
-                Integer currentDayInMonth = monthList.get(week).get(d);
+            for (int day = 0; day < monthList.get(week).size(); day++) {
+                Integer currentDayInMonth = monthList.get(week).get(day);
 
                 if (currentDayInMonth == null) {
-                    System.out.print("     ");
+                    System.out.print("     "); // Empty space for alignment
                 } else if (currentDayInMonth == currentDay && currentMonth == month && currentYear == year) {
-                    // Highlight the current day
-                    System.out.print(" " + BLACK + WHITE_BG + currentDayInMonth + RESET + "  ");
+
+                    if (hasTask(LocalDate.of(year, month, currentDayInMonth))) {
+                        System.out.print("[" + DARK_RED + currentDayInMonth + RESET + "] "); // Dark Red for current day with a task
+                    } else {
+                        System.out.print("[" + CYAN + currentDayInMonth + RESET + "] "); // Cyan for no task current day
+                    }
+
                 } else if (hasTask(LocalDate.of(year, month, currentDayInMonth))) {
-                    // Highlight days with tasks
-                    System.out.print(" " + GREEN + currentDayInMonth + "!" + RESET + " ");
+                    // Days with tasks are Green + !
+                    System.out.printf(" %s%2d%s  ", GREEN, currentDayInMonth, RESET);
                 } else {
-                    System.out.printf(" %2d  ", currentDayInMonth);  // Display normally
+                    // Normal days Light gray
+                    System.out.printf(" %s%2d%s  ", LIGHT_GRAY, currentDayInMonth, RESET);
                 }
             }
-            System.out.println();
+            System.out.println(); // Move to the next week row
         }
     }
 
@@ -102,73 +116,93 @@ public class Calendar {
     public void addTask() {
         Scanner scanner = new Scanner(System.in);
 
-        // Prompt for date
-        System.out.print("Enter date (DD/MM/YY) to add task: ");
-        String dateString = scanner.nextLine().trim();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yy");
+        LocalDate taskDate =  null;
+        String taskType = "";
 
-        try {
-            LocalDate taskDate = LocalDate.parse(dateString, formatter);
+        System.out.println(BOLD + YELLOW + "======== TASK CREATION ========" + RESET);
 
+        while (taskDate == null) {
+            // Prompt for date
+            System.out.print("Enter date (DD/MM/YY or D/M/YY) to add task: ");
+            String dateString = scanner.nextLine().trim();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yy");
+
+            try {
+                taskDate = LocalDate.parse(dateString, formatter);
+            } catch (DateTimeParseException e) {
+                System.out.println(DARK_RED + "Invalid date format! Please use DD/MM/YY format." + RESET);
+            }
+        }
+
+        boolean exit  = false;
+
+        while (!exit) {
             // Prompt for task type and information
-            System.out.println("Enter task type: ");
             System.out.println("1) Academic");
             System.out.println("2) Social & Personal");
             System.out.println("3) Health & Wellbeing");
 
-            System.out.print("Choose an option: ");
+            System.out.print("Enter task type: ");
 
             String choice = scanner.nextLine().trim();
 
             switch (choice) {
-                case "1" -> { String taskType = scanner.nextLine().trim();; }
-                case "2" -> { calendar.nextMonth(); calendar.displayCalendar(); }
-                case "3" -> { calendar.addTask(); }
-                case "4" -> exit = true;
-
-                default -> System.out.println("Invalid choice. ");
+                case "1" -> { taskType = "Academic"; exit = true; }
+                case "2" -> { taskType = "Social & Personal"; exit = true; }
+                case "3" -> { taskType = "Health & Wellbeing"; exit = true; }
+                default -> System.out.print(DARK_RED + "Invalid choice. " + RESET);
             }
-
-            // Create the task
-            Task task = new Task(taskDate, taskType, taskInfo);
-            tasks.add(task);  // Add task to list
-
-            System.out.println("Task added for: " + taskDate);
-        } catch (DateTimeParseException e) {
-            System.out.println("Invalid date format!");
         }
-        System.out.println(tasks);
+
+        System.out.println("Enter task info if needed: ");
+
+        String taskInfo = scanner.nextLine().trim();
+
+        // Create the task
+        Task task = new Task(taskDate, taskType, taskInfo);
+        tasks.add(task);  // Add task to list
+
     }
 
-    // Navigate to previous or next month
-    public void prevMonth() {
-        if (month == 1) {
-            month = 12;
-            year--;
-        } else {
-            month--;
-        }
+    public void saveTaskToFile(LocalDate date, String type, String info) {
+        writer.write(date.format(DateTimeFormatter.ofPattern("d/M/yy")) + "," + type + "," + info);
+        writer.newLine();  // Move to next line
+    } catch (IOException e) {
+        System.out.println(RED + "Error saving task!" + RESET);
     }
+}
 
-    public void nextMonth() {
-        if (month == 12) {
-            month = 1;
-            year++;
-        } else {
-            month++;
-        }
-    }
 
-    // Display current date and time
-    public void displayCurrentDate() {
-        LocalDate date = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, dd MMMM yyyy");
-        System.out.println(date.format(formatter));
-    }
 
-    public void displayCurrentTime() {
-        LocalDateTime time = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-        System.out.println(time.format(formatter));
+// Navigate to previous or next month
+public void prevMonth() {
+    if (month == 1) {
+        month = 12;
+        year--;
+    } else {
+        month--;
     }
+}
+
+public void nextMonth() {
+    if (month == 12) {
+        month = 1;
+        year++;
+    } else {
+        month++;
+    }
+}
+
+// Display current date and time
+public void displayCurrentDate() {
+    LocalDate date = LocalDate.now();
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, dd MMMM yyyy");
+    System.out.println(date.format(formatter));
+}
+
+public void displayCurrentTime() {
+    LocalDateTime time = LocalDateTime.now();
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+    System.out.println(time.format(formatter));
+}
 }

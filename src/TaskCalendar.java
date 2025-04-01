@@ -83,11 +83,10 @@ public class TaskCalendar {
                 if (currentDayInMonth == null) {
                     System.out.print("     "); // Empty space for alignment
                 } else if (currentDayInMonth == currentDay && currentMonth == month && currentYear == year) {
-
                     if (hasTask(LocalDate.of(year, month, currentDayInMonth))) {
-                        System.out.print("[" + DARK_RED + currentDayInMonth + RESET + "] "); // Dark Red for current day with a task
+                        System.out.printf("[%s%2d%s] ", DARK_RED, currentDayInMonth, RESET);
                     } else {
-                        System.out.print("[" + CYAN + currentDayInMonth + RESET + "] "); // Cyan for no task current day
+                        System.out.printf("[%s%2d%s] ", CYAN, currentDayInMonth, RESET);
                     }
 
                 } else if (hasTask(LocalDate.of(year, month, currentDayInMonth))) {
@@ -101,6 +100,7 @@ public class TaskCalendar {
             System.out.println(); // Move to the next week row
         }
     }
+
 
     public boolean hasTask(LocalDate date) {
         for (int i = 0; i < tasks.size(); i++) {
@@ -136,12 +136,12 @@ public class TaskCalendar {
 
         boolean exit = false;
 
+        System.out.println("1) Academic");
+        System.out.println("2) Social & Personal");
+        System.out.println("3) Health & Wellbeing");
+
         while (!exit) {
             // Prompt for task type and information
-            System.out.println("1) Academic");
-            System.out.println("2) Social & Personal");
-            System.out.println("3) Health & Wellbeing");
-
             System.out.print("Enter task type: ");
 
             String choice = scanner.nextLine().trim();
@@ -159,7 +159,7 @@ public class TaskCalendar {
                     taskType = "Health & Wellbeing";
                     exit = true;
                 }
-                default -> System.out.print(DARK_RED + "Invalid choice. " + RESET);
+                default -> System.out.println(DARK_RED + "Invalid choice. " + RESET);
             }
         }
 

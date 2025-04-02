@@ -10,6 +10,11 @@ public class TaskCalendar {
     int year;
     Database taskFile;
 
+    LocalDate today = LocalDate.now();
+    int currentDay = today.getDayOfMonth();
+    int currentMonth = today.getMonthValue();
+    int currentYear = today.getYear();
+
     List<Task> tasks = new ArrayList<>();  // Store tasks in a list
 
     //COLOURS
@@ -20,7 +25,7 @@ public class TaskCalendar {
     String CYAN = "\033[0;36m";
     String BLACK = "\u001B[30m";
     String WHITE_BG = "\u001B[47m";
-    String BOLD = "\033[1m";  // Bold
+    String BOLD = "\033[1m";
     String LIGHT_GRAY = "\033[0;37m"; // Light Gray (Bright White)
 
 
@@ -60,10 +65,7 @@ public class TaskCalendar {
     public void displayCalendar() {
         ArrayList<ArrayList<Integer>> monthList = createCalendar();
         LocalDate selectedMonth = LocalDate.of(year, month, 1);
-        LocalDate today = LocalDate.now();
-        int currentDay = today.getDayOfMonth();
-        int currentMonth = today.getMonthValue();
-        int currentYear = today.getYear();
+
 
         System.out.println(BOLD + "============ CALENDAR ============" + RESET);
 
@@ -83,6 +85,7 @@ public class TaskCalendar {
                 if (currentDayInMonth == null) {
                     System.out.print("     "); // Empty space for alignment
                 } else if (currentDayInMonth == currentDay && currentMonth == month && currentYear == year) {
+
                     if (hasTask(LocalDate.of(year, month, currentDayInMonth))) {
                         System.out.printf("[%s%2d%s] ", DARK_RED, currentDayInMonth, RESET);
                     } else {
@@ -90,8 +93,13 @@ public class TaskCalendar {
                     }
 
                 } else if (hasTask(LocalDate.of(year, month, currentDayInMonth))) {
-                    // Days with tasks are Green + !
-                    System.out.printf(" %s%2d%s  ", GREEN, currentDayInMonth, RESET);
+                    if (currentDayInMonth < currentDay && currentMonth == month && currentYear == year) {
+                        //  tasks with passed due dates are red
+                        System.out.printf(" %s%2d%s  ", DARK_RED, currentDayInMonth, RESET);
+                    } else {
+                        // future days with tasks are Green
+                        System.out.printf(" %s%2d%s  ", GREEN, currentDayInMonth, RESET);
+                    }
                 } else {
                     // Normal days Light gray
                     System.out.printf(" %s%2d%s  ", LIGHT_GRAY, currentDayInMonth, RESET);
@@ -100,7 +108,6 @@ public class TaskCalendar {
             System.out.println(); // Move to the next week row
         }
     }
-
 
     public boolean hasTask(LocalDate date) {
         for (int i = 0; i < tasks.size(); i++) {
@@ -120,28 +127,35 @@ public class TaskCalendar {
         String taskType = "";
 
         System.out.println(BOLD + YELLOW + "======== TASK CREATION ========" + RESET);
+        System.out.print("Enter date (DD/MM/YY or D/M/YY) to add task: ");
 
         while (taskDate == null) {
             // Prompt for date
-            System.out.print("Enter date (DD/MM/YY or D/M/YY) to add task: ");
-            String dateString = scanner.nextLine().trim();
+            String date = scanner.nextLine().trim();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yy");
 
             try {
-                taskDate = LocalDate.parse(dateString, formatter);
+                taskDate = LocalDate.parse(date, formatter);
+                System.out.println(taskDate);
+                System.out.println(taskDate.getDayOfMonth() + "" + today.lengthOfMonth());
+                if (taskDate.getDayOfMonth() > today.lengthOfMonth()) {
+                    System.out.print(DARK_RED + "Invalid date! Please use a date within the month: " + RESET);
+                }
+
             } catch (DateTimeParseException e) {
-                System.out.println(DARK_RED + "Invalid date format! Please use DD/MM/YY format." + RESET);
+                System.out.print(DARK_RED + "Invalid date format! Please use the correct format: " + RESET);
             }
         }
 
         boolean exit = false;
 
+        // Prompt for task type and information
         System.out.println("1) Academic");
         System.out.println("2) Social & Personal");
         System.out.println("3) Health & Wellbeing");
 
         while (!exit) {
-            // Prompt for task type and information
+
             System.out.print("Enter task type: ");
 
             String choice = scanner.nextLine().trim();
@@ -159,7 +173,7 @@ public class TaskCalendar {
                     taskType = "Health & Wellbeing";
                     exit = true;
                 }
-                default -> System.out.println(DARK_RED + "Invalid choice. " + RESET);
+                default -> System.out.print(DARK_RED + "Invalid choice. " + RESET);
             }
         }
 

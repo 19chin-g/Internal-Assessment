@@ -14,8 +14,7 @@ public class Main {
         //COLOURS
         String RESET = "\u001B[0m";
         String DARK_RED = "\033[0;31m";
-        String BOLD = "\033[1m";  // Bold
-
+        String BOLD = "\033[1m";
 
         Scanner scanner = new Scanner(System.in);
         System.out.println(BOLD + "Welcome to Study Planner!" + RESET);

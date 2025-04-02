@@ -14,9 +14,10 @@ public class Main {
         //COLOURS
         String RESET = "\u001B[0m";
         String DARK_RED = "\033[0;31m";
+        String BOLD = "\033[1m";
 
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Welcome!");
+        System.out.println(BOLD + "Welcome to Study Planner!" + RESET);
         System.out.println("1) Login");
         System.out.println("2) Register");
 

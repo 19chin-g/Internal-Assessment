@@ -40,7 +40,7 @@ public class Main {
 
 
         LocalDate today = LocalDate.now();
-        TaskCalendar calendar = new TaskCalendar(today.getDayOfMonth(), today.getMonthValue(), today.getYear()) {
+        TaskCalendar calendar = new TaskCalendar(today.getDayOfMonth(), today.getMonthValue(), today.getYear(), "tasks.txt") {
         };
 
         System.out.println();

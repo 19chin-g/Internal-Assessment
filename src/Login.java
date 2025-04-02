@@ -1,51 +1,47 @@
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Login {
     Database loginFile;
     int userID;
 
-    //COLOURS
     String YELLOW = "\u001B[33m";
     String RESET = "\u001B[0m";
-    String BOLD = "\033[1m";  // Bold
+    String BOLD = "\033[1m";
     String DARK_RED = "\033[0;31m";
-
 
     public Login(String filename) {
         loginFile = new Database(filename);
     }
 
-    // Method checking if user is in loginFile when login
+    // Method to check if user exists
     public boolean findUser(String username, String password) {
-        int recordNum = 0;
-        String[] record;
+        ArrayList<String> records = loginFile.readAllRecords();
 
-        while ((record = loginFile.readRecord(recordNum)) != null) {
-            if (record.length > 0 && record[0].equals(username) && record[1].equals(password)) {
-                userID = recordNum;
+        for (String record : records) {
+            String[] userInfo = record.split(" ");  // Split record into username and password
+            if (userInfo[0].equals(username) && userInfo[1].equals(password)) {
                 return true;
             }
-            recordNum++;
         }
         return false;
     }
 
-    // Method to check for same username
+    // Method to check if username is already taken
     public boolean isUserTaken(String username) {
-        int recordNum = 0;
-        String[] record;
+        ArrayList<String> records = loginFile.readAllRecords();
 
-        while ((record = loginFile.readRecord(recordNum)) != null) {
-            if (record.length > 0 && record[0].equals(username)) {
+        for (String record : records) {
+            String[] userCredentials = record.split(" ");
+            if (userCredentials[0].equals(username)) {
                 return true;
             }
-            recordNum++;
         }
         return false;
     }
 
-    // Method to handle login process
-    public Boolean login() {
+    // Method for login process
+    public boolean login() {
         Scanner scanner = new Scanner(System.in);
         System.out.println(BOLD + YELLOW + "========== LOGIN ==========" + RESET);
 
@@ -56,10 +52,9 @@ public class Login {
 
         if (findUser(username, password)) {
             System.out.println("Login successful!");
-            System.out.println("User ID: " + userID);
             return true;
         } else {
-            System.out.print(DARK_RED +"Invalid username or password. " + RESET);
+            System.out.println(DARK_RED + "Invalid username or password." + RESET);
             return false;
         }
     }
@@ -72,31 +67,36 @@ public class Login {
 
         System.out.println(BOLD + YELLOW + "======== REGISTER ========" + RESET);
 
-        while (username.isBlank() || isUserTaken(username)) {
+        while (username.isBlank() || isUserTaken(username) || username.contains(" ")) {
             System.out.print("Enter a username: ");
-            username = scanner.nextLine().trim(); // makes sure just spaces aren't allowed
+            username = scanner.nextLine().trim();
+
             if (username.isBlank()) {
-                System.out.println(DARK_RED + "Username cannot be empty! Please enter a valid username." + RESET);
+                System.out.println(DARK_RED + "Username cannot be empty!" + RESET);
             } else if (isUserTaken(username)) {
-                System.out.println(DARK_RED + "Username has been taken! Please enter a valid username." + RESET);
+                System.out.println(DARK_RED + "Username has been taken!" + RESET);
+            } else if (username.contains(" ")) {
+                System.out.println(DARK_RED + "Username cannot contain spaces!" + RESET);
             }
         }
 
-        while (password.isBlank()) {
+        while (password.isBlank() || password.contains(" ")) {
             System.out.print("Enter a password: ");
-            password = scanner.nextLine().trim(); // note - trim removes leading and trailing white space
+            password = scanner.nextLine().trim();
+
             if (password.isBlank()) {
-                System.out.println(DARK_RED + "Password cannot be empty! Please enter a valid password." + RESET);
+                System.out.println(DARK_RED + "Password cannot be empty!" + RESET);
+            } else if (password.contains(" ")) {
+                System.out.println(DARK_RED + "Password cannot contain spaces!" + RESET);
             }
         }
 
-        User newUser = new User(username, password);
-        loginFile.addUser(newUser);
+        String userRecord = username + " " + password;
+        loginFile.addRecord(userRecord);  // Append user to the file
         System.out.println("User registered successfully.");
     }
 
     public int getUserID() {
         return userID;
     }
-
 }

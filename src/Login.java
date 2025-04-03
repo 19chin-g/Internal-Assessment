@@ -14,7 +14,7 @@ public class Login {
         loginFile = new Database(filename);
     }
 
-    // Method to check if user exists
+    // check if user exists in database
     public boolean findUser(String username, String password) {
         ArrayList<String> records = loginFile.readAllRecords();
 
@@ -23,24 +23,25 @@ public class Login {
             if (userInfo[0].equals(username) && userInfo[1].equals(password)) {
                 return true;
             }
+            userID ++;
         }
         return false;
     }
 
-    // Method to check if username is already taken
+    // check if username is already taken
     public boolean isUserTaken(String username) {
         ArrayList<String> records = loginFile.readAllRecords();
 
         for (String record : records) {
-            String[] userCredentials = record.split(" ");
-            if (userCredentials[0].equals(username)) {
+            String[] userInfo = record.split(" ");
+            if (userInfo[0].equals(username)) {
                 return true;
             }
         }
         return false;
     }
 
-    // Method for login process
+    // login process
     public boolean login() {
         Scanner scanner = new Scanner(System.in);
         System.out.println(BOLD + YELLOW + "========== LOGIN ==========" + RESET);
@@ -52,6 +53,7 @@ public class Login {
 
         if (findUser(username, password)) {
             System.out.println("Login successful!");
+            System.out.println("User ID: " + userID);
             return true;
         } else {
             System.out.println(DARK_RED + "Invalid username or password." + RESET);
@@ -59,7 +61,7 @@ public class Login {
         }
     }
 
-    // Method to register a new user
+    // register a new user
     public void register() {
         Scanner scanner = new Scanner(System.in);
         String username = "";
@@ -91,8 +93,8 @@ public class Login {
             }
         }
 
-        String userRecord = username + " " + password;
-        loginFile.addRecord(userRecord);  // Append user to the file
+        User user = new User(username, password);
+        loginFile.addRecord(user.toString());  // Append user to the file
         System.out.println("User registered successfully.");
     }
 

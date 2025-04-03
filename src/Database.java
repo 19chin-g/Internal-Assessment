@@ -1,5 +1,4 @@
 import java.io.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +30,7 @@ public class Database {
             writer.write(data);
             writer.newLine();
         } catch (IOException e) {
-            System.out.println("Error writing to file.");
+            System.out.println("Error writing to file");
         }
     }
 
@@ -50,7 +49,7 @@ public class Database {
                 writer.newLine();
             }
         } catch (IOException e) {
-            System.out.println("Error updating file.");
+            System.out.println("Error updating file");
         }
     }
 }

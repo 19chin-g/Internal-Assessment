@@ -1,8 +1,8 @@
 import java.time.*;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class TaskCalendar {
+    int userID;
     int day;
     int month;
     int year;
@@ -22,12 +22,16 @@ public class TaskCalendar {
     String LIGHT_GRAY = "\033[0;37m"; // Light Gray (Bright White)
     String BOLD = "\033[1m";
 
-    public TaskCalendar(int day, int month, int year, String filename) {
+
+    public TaskCalendar(int userID, int day, int month, int year, String filename) {
+        this.userID = userID;
         this.day = day;
         this.month = month;
         this.year = year;
-        this.taskFile = new Database(filename); // Set the taskFile to use the provided filename
+        this.taskFile = new Database(filename);
     }
+
+
 
     // Create the calendar
     public ArrayList<ArrayList<Integer>> createCalendar() {
@@ -78,12 +82,12 @@ public class TaskCalendar {
                 if (currentDayInMonth == null) {
                     System.out.print("     "); // Empty space for alignment
                 } else if (currentDayInMonth == currentDay && currentMonth == month && currentYear == year) {
-                    if (hasTask(LocalDate.of(year, month, currentDayInMonth))) {
+                    if (hasTask(userID, LocalDate.of(year, month, currentDayInMonth))) {
                         System.out.printf("[%s%2d%s] ", DARK_RED, currentDayInMonth, RESET);
                     } else {
                         System.out.printf("[%s%2d%s] ", CYAN, currentDayInMonth, RESET);
                     }
-                } else if (hasTask(LocalDate.of(year, month, currentDayInMonth))) {
+                } else if (hasTask(userID, LocalDate.of(year, month, currentDayInMonth))) {
                     if (currentDayInMonth < currentDay && currentMonth == month && currentYear == year) {
                         // Tasks with passed due dates are red
                         System.out.printf(" %s%2d%s  ", DARK_RED, currentDayInMonth, RESET);
@@ -100,20 +104,20 @@ public class TaskCalendar {
         }
     }
 
-    // Check if a task exists on a specific date by checking the taskFile
-    public boolean hasTask(LocalDate date) {
-        // Read the records from the taskFile and check for the date
+    // check if a task exists on a specific date for the current user
+    public boolean hasTask(int userID, LocalDate date) {
         ArrayList<String> records = taskFile.readAllRecords();
         if (records != null) {
             for (String record : records) {
-                String[] taskDetails = record.split(" ; ");  // Split by semicolon
-                if (taskDetails[0].equals(date.toString())) {
-                    return true;  // Return true if task is found for the date
+                String[] taskDetails = record.split(" ; "); // userID ; date ; type ; info
+                if (taskDetails.length >= 2 && taskDetails[0].equals(String.valueOf(userID)) && taskDetails[1].equals(date.toString())) {
+                    return true;  // task found for this exact user on the given date
                 }
             }
         }
-        return false;  // Return false if no task is found for the date
+        return false;  // No task found for this user on this date
     }
+
 
     // Add a task to a specific date
     public void addTask() {
@@ -140,6 +144,7 @@ public class TaskCalendar {
                     inputYear += 2000; // Converts to full year: 25 -> 2025
                     int daysInMonth = YearMonth.of(inputYear, inputMonth).lengthOfMonth();
 
+                    // ensures it is a valid date within the month
                     if (inputDay >= 1 && inputDay <= daysInMonth) {
                         taskDate = LocalDate.of(inputYear, inputMonth, inputDay);
                     } else {
@@ -152,7 +157,7 @@ public class TaskCalendar {
             }
         }
 
-        // Prompt for task type and information
+        // prompt for task type and information
         System.out.println("1) Academic");
         System.out.println("2) Social & Personal");
         System.out.println("3) Health & Wellbeing");
@@ -176,15 +181,16 @@ public class TaskCalendar {
             }
         }
 
-        saveTask(taskDate, taskType, taskInfo);
+        saveTask(userID, taskDate, taskType, taskInfo);
     }
 
     // Save the task to the file
-    public void saveTask(LocalDate date, String type, String info) {
-        String taskData = date.toString() + " ; " + type + " ; " + info;
-        taskFile.addRecord(taskData);  // Store in the text file
+    public void saveTask(int userID, LocalDate taskDate, String type, String info) {
+        String taskData = userID + " ; " + taskDate.toString() + " ; " + type + " ; " + info; // format it
+        taskFile.addRecord(taskData);  // store in the text file
         System.out.println(GREEN + "Task saved successfully!" + RESET);
     }
+
 
     // Navigate to the previous month
     public void prevMonth() {

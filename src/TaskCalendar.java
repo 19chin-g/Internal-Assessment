@@ -135,27 +135,48 @@ public class TaskCalendar {
 
             if (dateParts.length != 3) {
                 System.out.print(DARK_RED + "Invalid format! Please use DD/MM/YY: " + RESET);
-            } else {
-                try {
-                    int inputDay = Integer.parseInt(dateParts[0]);
-                    int inputMonth = Integer.parseInt(dateParts[1]);
-                    int inputYear = Integer.parseInt(dateParts[2]);
+                continue; // loops back until valid
+            }
 
-                    inputYear += 2000; // Converts to full year: 25 -> 2025
-                    int daysInMonth = YearMonth.of(inputYear, inputMonth).lengthOfMonth();
+            try {
+                int inputDay = Integer.parseInt(dateParts[0]);
+                int inputMonth = Integer.parseInt(dateParts[1]);
+                int inputYear = Integer.parseInt(dateParts[2]);
 
-                    // ensures it is a valid date within the month
-                    if (inputDay >= 1 && inputDay <= daysInMonth) {
-                        taskDate = LocalDate.of(inputYear, inputMonth, inputDay);
-                    } else {
-                        System.out.print(DARK_RED + "Invalid date! Please use valid date: " + RESET);
-                    }
-
-                } catch (NumberFormatException e) { // Ensures numbers are used in between /
-                    System.out.print(DARK_RED + "Invalid numbers! Use DD/MM/YY format: " + RESET);
+                // Ensure each part has at most 2 digits
+                if (dateParts[0].length() > 2 || dateParts[1].length() > 2 || dateParts[2].length() > 2) {
+                    System.out.print(DARK_RED + "Invalid format! Use DD/MM/YY format: " + RESET);
+                    continue;
                 }
+
+                // Ensure month is between 1 and 12
+                if (inputMonth < 1 || inputMonth > 12) {
+                    System.out.print(DARK_RED + "Invalid month! Use DD/MM/YY format: " + RESET);
+                    continue;
+                }
+
+                // Ensure year is between 00 and 99
+                if (inputYear < 0 || inputYear > 99) {
+                    System.out.print(DARK_RED + "Invalid year! Use DD/MM/YY format: " + RESET);
+                    continue;
+                }
+
+                inputYear += 2000; // Converts to full year: 25 -> 2025
+                int daysInMonth = YearMonth.of(inputYear, inputMonth).lengthOfMonth();
+
+                // Check if the day is valid for the given month
+                if (inputDay >= 1 && inputDay <= daysInMonth) {
+                    taskDate = LocalDate.of(inputYear, inputMonth, inputDay);
+                } else {
+                    System.out.print(DARK_RED + "Invalid date! Please use valid date: " + RESET);
+                }
+
+            } catch (NumberFormatException e) {
+                System.out.print(DARK_RED + "Invalid numbers! Use DD/MM/YY format: " + RESET);
             }
         }
+
+
 
         // prompt for task type and information
         System.out.println("1) Academic");

@@ -55,15 +55,15 @@ public class Main {
             String choice = scanner.nextLine().trim();
 
             switch (choice) {
-                case "1" -> {
+                case "1" -> { // view previous month
                     calendar.prevMonth();
                     calendar.displayCalendar();
                 }
-                case "2" -> {
+                case "2" -> { // view next month
                     calendar.nextMonth();
                     calendar.displayCalendar();
                 }
-                case "3" -> {
+                case "3" -> { // set a task
                     calendar.addTask();
                 }
                 case "4" -> exit = true;

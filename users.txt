@@ -1,14 +1,1 @@
-john123 password1
-sarah89 1234abcd
-mike456 abcdefg
-emily77 12345abc
-andrew99 qwerty123
-katie12 111222333
-lucas01 98765432
-olivia33 welcome1
-david22 letmein123
-natalie45 password123
-banana smith
-1 1
-test test
-check 123
+19chin_g BURger12345!

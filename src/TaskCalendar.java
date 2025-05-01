@@ -104,13 +104,13 @@ public class TaskCalendar {
         }
     }
 
-    // check if a task exists on a specific date for the current user
+    // check if a task exists on a specific date for the current use
     public boolean hasTask(int userID, LocalDate date) {
         ArrayList<String> records = taskFile.readAllRecords();
         if (records != null) {
             for (String record : records) {
                 String[] taskDetails = record.split(" ; "); // userID ; date ; type ; info
-                if (taskDetails.length >= 2 && taskDetails[0].equals(String.valueOf(userID)) && taskDetails[1].equals(date.toString())) {
+                if (taskDetails.length >= 3 && taskDetails[0].equals(String.valueOf(userID)) && taskDetails[1].equals(date.toString())) {
                     return true;  // task found for this exact user on the given date
                 }
             }
@@ -118,6 +118,18 @@ public class TaskCalendar {
         return false;  // No task found for this user on this date
     }
 
+    public void removeTask(int userID, LocalDate taskDate, String type, String info) {
+        String taskData =  userID + " ; " + taskDate.toString() + " ; " + type + " ; " + info; // format it
+        ArrayList<String> records = taskFile.readAllRecords();
+        if (records != null) {
+            for (String record : records) {
+                String[] taskDetails = record.split(" ; "); // userID ; date ; type ; info
+                if (taskDetails[0].equals(String.valueOf(userID))) {
+
+                }
+            }
+        }
+    }
 
     // Add a task to a specific date
     public void addTask() {
@@ -211,6 +223,8 @@ public class TaskCalendar {
         taskFile.addRecord(taskData);  // store in the text file
         System.out.println(GREEN + "Task saved successfully!" + RESET);
     }
+
+
 
 
     // Navigate to the previous month

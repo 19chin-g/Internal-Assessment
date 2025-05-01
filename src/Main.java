@@ -48,7 +48,7 @@ public class Main {
         // calendar options
         System.out.println("1) Previous month");
         System.out.println("2) Next month");
-        System.out.println("3) Set task");
+        System.out.println("3) Tasks");
         System.out.println("4) Exit");
         while (!exit) {
             System.out.print("Choose an option: ");
@@ -63,8 +63,29 @@ public class Main {
                     calendar.nextMonth();
                     calendar.displayCalendar();
                 }
-                case "3" -> { // set a task
-                    calendar.addTask();
+                case "3" -> { // open task options
+                    System.out.println("1) Create task");
+                    System.out.println("2) Complete task");
+                    System.out.println("3) Remove Task");
+                    System.out.println("4) View tasks");
+                    System.out.print("Choose an option: ");
+                    choice = scanner.nextLine().trim();
+
+                    switch (choice) {
+                        case "1" -> { // adds a task
+                            calendar.addTask();
+                        }
+                        case "2" -> { // marks a task as complete
+
+                        }
+                        case "3" -> {
+
+                        }
+                        case "4" -> {
+
+                        }
+                        default -> System.out.print(DARK_RED + "Invalid choice. " + RESET);
+                    }
                 }
                 case "4" -> exit = true;
                 default -> System.out.print(DARK_RED + "Invalid choice. " + RESET);

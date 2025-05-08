@@ -118,32 +118,33 @@ public class TaskCalendar {
         return false;  // No task found for this user on this date
     }
 
-    public void removeTask(int userID, LocalDate taskDate, String type, String info) {
-        String taskData =  userID + " ; " + taskDate.toString() + " ; " + type + " ; " + info; // format it
+    public void removeTask() {
+        Scanner scanner = new Scanner(System.in);
+        LocalDate taskDate = null;
+        System.out.println("Enter date (DD/MM/YY or D/M/YY) of completed task: ");
+        String input = scanner.nextLine().trim();
+        taskDate = stringToLocalDate(input);
+
         ArrayList<String> records = taskFile.readAllRecords();
+        int recordNum = 0;
         if (records != null) {
             for (String record : records) {
+                recordNum++;
                 String[] taskDetails = record.split(" ; "); // userID ; date ; type ; info
-                if (taskDetails[0].equals(String.valueOf(userID))) {
-
+                System.out.println(taskDetails);
+                if (taskDetails.length >= 3 && taskDetails[0].equals(String.valueOf(userID)) && taskDetails[1].equals(taskDate.toString())) {
+                    taskFile.removeRecord(recordNum);
                 }
             }
         }
     }
 
-    // Add a task to a specific date
-    public void addTask() {
-        Scanner scanner = new Scanner(System.in);
-        LocalDate taskDate = null;
-        String taskType = "";
-        String taskInfo = "";
 
-        System.out.println(BOLD + YELLOW + "======== TASK CREATION ========" + RESET);
-        System.out.print("Enter date (DD/MM/YY or D/M/YY) to add task: ");
+    public LocalDate stringToLocalDate(String date) {
+        LocalDate taskDate = null;
 
         while (taskDate == null) {
-            String input = scanner.nextLine().trim();
-            String[] dateParts = input.split("/");
+            String[] dateParts = date.split("/");
 
             if (dateParts.length != 3) {
                 System.out.print(DARK_RED + "Invalid format! Please use DD/MM/YY: " + RESET);
@@ -187,6 +188,21 @@ public class TaskCalendar {
                 System.out.print(DARK_RED + "Invalid numbers! Use DD/MM/YY format: " + RESET);
             }
         }
+        return taskDate;
+    }
+
+
+    // Add a task to a specific date
+    public void addTask() {
+        Scanner scanner = new Scanner(System.in);
+        LocalDate taskDate = null;
+        String taskType = "";
+        String taskInfo = "";
+
+        System.out.println(BOLD + YELLOW + "======== TASK CREATION ========" + RESET);
+        System.out.print("Enter date (DD/MM/YY or D/M/YY) to add task: ");
+        String input = scanner.nextLine().trim();
+        taskDate = stringToLocalDate(input);
 
 
 

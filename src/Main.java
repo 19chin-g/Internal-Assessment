@@ -65,9 +65,8 @@ public class Main {
                 }
                 case "3" -> { // open task options
                     System.out.println("1) Create task");
-                    System.out.println("2) Complete task");
-                    System.out.println("3) Remove Task");
-                    System.out.println("4) View tasks");
+                    System.out.println("2) View task");
+                    System.out.println("3) Complete Task");
                     System.out.print("Choose an option: ");
                     choice = scanner.nextLine().trim();
 
@@ -75,14 +74,11 @@ public class Main {
                         case "1" -> { // adds a task
                             calendar.addTask();
                         }
-                        case "2" -> { // marks a task as complete
+                        case "2" -> { // shows task details for specified date
 
                         }
                         case "3" -> {
-
-                        }
-                        case "4" -> {
-
+                            calendar.removeTask();
                         }
                         default -> System.out.print(DARK_RED + "Invalid choice. " + RESET);
                     }

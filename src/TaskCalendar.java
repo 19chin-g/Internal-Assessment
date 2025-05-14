@@ -121,75 +121,72 @@ public class TaskCalendar {
     public void removeTask() {
         Scanner scanner = new Scanner(System.in);
         LocalDate taskDate = null;
-        System.out.println("Enter date (DD/MM/YY or D/M/YY) of completed task: ");
-        String input = scanner.nextLine().trim();
-        taskDate = stringToLocalDate(input);
+        while (taskDate == null) {
+            System.out.print("Enter date (DD/MM/YY or D/M/YY) of completed task: ");
+            String input = scanner.nextLine().trim();
+            taskDate = stringToLocalDate(input);
+        }
 
-        ArrayList<String> records = taskFile.readAllRecords();
-        int recordNum = 0;
-        if (records != null) {
-            for (String record : records) {
-                recordNum++;
-                String[] taskDetails = record.split(" ; "); // userID ; date ; type ; info
-                System.out.println(taskDetails);
-                if (taskDetails.length >= 3 && taskDetails[0].equals(String.valueOf(userID)) && taskDetails[1].equals(taskDate.toString())) {
-                    taskFile.removeRecord(recordNum);
+        if (hasTask(userID, taskDate)) {
+            ArrayList<String> records = taskFile.readAllRecords();
+            int recordNum = 0;
+            if (records != null) {
+                for (String record : records) {
+                    recordNum++;
+                    String[] taskDetails = record.split(" ; "); // userID ; date ; type ; info
+                    if (taskDetails.length >= 3 && taskDetails[0].equals(String.valueOf(userID)) && taskDetails[1].equals(taskDate.toString())) {
+                        taskFile.removeRecord(recordNum);
+                        System.out.println(GREEN + "Task removed successfully." + RESET);
+                    }
+
                 }
             }
+        } else {
+            System.out.println("No tasks on specified date.");
         }
     }
 
 
     public LocalDate stringToLocalDate(String date) {
-        LocalDate taskDate = null;
-
-        while (taskDate == null) {
+        try {
             String[] dateParts = date.split("/");
 
-            if (dateParts.length != 3) {
-                System.out.print(DARK_RED + "Invalid format! Please use DD/MM/YY: " + RESET);
-                continue; // loops back until valid
+            int inputDay = Integer.parseInt(dateParts[0]);
+            int inputMonth = Integer.parseInt(dateParts[1]);
+            int inputYear = Integer.parseInt(dateParts[2]);
+
+            // Optional: reject if parts are too long (e.g. "123/45/67")
+            if (dateParts[0].length() > 2 || dateParts[1].length() > 2 || dateParts[2].length() > 2) {
+                System.out.println(DARK_RED + "1Invalid format! Use DD/MM/YY format. " + RESET);
+                return null;
             }
 
-            try {
-                int inputDay = Integer.parseInt(dateParts[0]);
-                int inputMonth = Integer.parseInt(dateParts[1]);
-                int inputYear = Integer.parseInt(dateParts[2]);
-
-                // Ensure each part has at most 2 digits
-                if (dateParts[0].length() > 2 || dateParts[1].length() > 2 || dateParts[2].length() > 2) {
-                    System.out.print(DARK_RED + "Invalid format! Use DD/MM/YY format: " + RESET);
-                    continue;
-                }
-
-                // Ensure month is between 1 and 12
-                if (inputMonth < 1 || inputMonth > 12) {
-                    System.out.print(DARK_RED + "Invalid month! Use DD/MM/YY format: " + RESET);
-                    continue;
-                }
-
-                // Ensure year is between 00 and 99
-                if (inputYear < 0 || inputYear > 99) {
-                    System.out.print(DARK_RED + "Invalid year! Use DD/MM/YY format: " + RESET);
-                    continue;
-                }
-
-                inputYear += 2000; // Converts to full year: 25 -> 2025
-                int daysInMonth = YearMonth.of(inputYear, inputMonth).lengthOfMonth();
-
-                // Check if the day is valid for the given month
-                if (inputDay >= 1 && inputDay <= daysInMonth) {
-                    taskDate = LocalDate.of(inputYear, inputMonth, inputDay);
-                } else {
-                    System.out.print(DARK_RED + "Invalid date! Please use valid date: " + RESET);
-                }
-
-            } catch (NumberFormatException e) {
-                System.out.print(DARK_RED + "Invalid numbers! Use DD/MM/YY format: " + RESET);
+            if (inputMonth < 1 || inputMonth > 12) {
+                System.out.println(DARK_RED + "Invalid month! Use DD/MM/YY format. " + RESET);
+                return null;
             }
+
+            if (inputYear < 0 || inputYear > 99) {
+                System.out.println(DARK_RED + "Invalid year! Use DD/MM/YY format. " + RESET);
+                return null;
+            }
+
+            inputYear += 2000;
+            int daysInMonth = YearMonth.of(inputYear, inputMonth).lengthOfMonth();
+
+            if (inputDay < 1 || inputDay > daysInMonth) {
+                System.out.println(DARK_RED + "Invalid day for given month/year. " + RESET);
+                return null;
+            }
+
+            return LocalDate.of(inputYear, inputMonth, inputDay);
+
+        } catch (Exception e) {
+            System.out.println(DARK_RED + "Invalid input! Use DD/MM/YY format with numbers. " + RESET);
+            return null;
         }
-        return taskDate;
     }
+
 
 
     // Add a task to a specific date
@@ -200,9 +197,11 @@ public class TaskCalendar {
         String taskInfo = "";
 
         System.out.println(BOLD + YELLOW + "======== TASK CREATION ========" + RESET);
-        System.out.print("Enter date (DD/MM/YY or D/M/YY) to add task: ");
-        String input = scanner.nextLine().trim();
-        taskDate = stringToLocalDate(input);
+        while (taskDate == null) {
+            System.out.print("Enter date (DD/MM/YY or D/M/YY) to add task: ");
+            String input = scanner.nextLine().trim();
+            taskDate = stringToLocalDate(input);
+        }
 
 
 

@@ -7,8 +7,7 @@ public class GUI extends JFrame {
     private JTextField textUsername;
     private JButton buttonOK;
 
-
-    // private final int WIDGET_HEIGHT = 30; use constants for easier rearranging
+    private final int WIDGET_HEIGHT = 30; //use constants for easier rearranging
 
 
     public GUI() {
@@ -16,16 +15,19 @@ public class GUI extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);  // quit the app when we close the window
         setSize(600, 400);
         setLayout(null);
-        labelOutput = new JLabel("Study Planner");
-        labelOutput.setBounds(250,50, 150, 150);
+        labelOutput = new JLabel("Date");
+        labelOutput.setBounds(250,50, 100, WIDGET_HEIGHT);
 
 
         textUsername = new JTextField();
-        textUsername.setBounds(50, 90, 200, 30);
+        textUsername.setBounds(250, 90, 200, WIDGET_HEIGHT);
+
+        buttonOK = new JButton("");
+        buttonOK.setBounds(150, 130, 100, WIDGET_HEIGHT);
+
+        buttonOK.addActionListener(buttonOK);
 
 
-        buttonOK = new JButton("OK");
-        buttonOK.setBounds(50, 130, 100, 30);
 
 
         add(labelOutput);
@@ -33,5 +35,7 @@ public class GUI extends JFrame {
         add(buttonOK);
         setVisible(true);
         System.out.println("SEQUENCE: GUI_test created");
+
+
     }
 }

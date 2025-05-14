@@ -11,9 +11,11 @@ username2 password2
 public class Main {
     public static void main(String[] args) {
 
+
         System.out.println("SEQUENCE: main started");
         GUI gui = new GUI();
         System.out.println("SEQUENCE: main finished");
+
 
         //COLOURS
         String RESET = "\u001B[0m";
@@ -85,11 +87,11 @@ public class Main {
                         case "3" -> {
                             calendar.removeTask();
                         }
-                        default -> System.out.print(DARK_RED + "Invalid choice. " + RESET);
+                        default -> System.out.println(DARK_RED + "Invalid choice. " + RESET);
                     }
                 }
                 case "4" -> exit = true;
-                default -> System.out.print(DARK_RED + "Invalid choice. " + RESET);
+                default -> System.out.println(DARK_RED + "Invalid choice. " + RESET);
             }
 
         }

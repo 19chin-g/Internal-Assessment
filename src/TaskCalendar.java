@@ -129,67 +129,59 @@ public class TaskCalendar {
         int recordNum = 0;
         if (records != null) {
             for (String record : records) {
-                recordNum++;
                 String[] taskDetails = record.split(" ; "); // userID ; date ; type ; info
-                System.out.println(taskDetails);
                 if (taskDetails.length >= 3 && taskDetails[0].equals(String.valueOf(userID)) && taskDetails[1].equals(taskDate.toString())) {
                     taskFile.removeRecord(recordNum);
+                    System.out.println("Task removed successfully");
                 }
+                recordNum++;
+
             }
         }
     }
 
 
     public LocalDate stringToLocalDate(String date) {
-        LocalDate taskDate = null;
-
-        while (taskDate == null) {
+        try {
             String[] dateParts = date.split("/");
 
-            if (dateParts.length != 3) {
-                System.out.print(DARK_RED + "Invalid format! Please use DD/MM/YY: " + RESET);
-                continue; // loops back until valid
+            int inputDay = Integer.parseInt(dateParts[0]);
+            int inputMonth = Integer.parseInt(dateParts[1]);
+            int inputYear = Integer.parseInt(dateParts[2]);
+
+            // Optional: reject if parts are too long (e.g. "123/45/67")
+            if (dateParts[0].length() > 2 || dateParts[1].length() > 2 || dateParts[2].length() > 2) {
+                System.out.print(DARK_RED + "Invalid format! Use DD/MM/YY format: " + RESET);
+                return null;
             }
 
-            try {
-                int inputDay = Integer.parseInt(dateParts[0]);
-                int inputMonth = Integer.parseInt(dateParts[1]);
-                int inputYear = Integer.parseInt(dateParts[2]);
-
-                // Ensure each part has at most 2 digits
-                if (dateParts[0].length() > 2 || dateParts[1].length() > 2 || dateParts[2].length() > 2) {
-                    System.out.print(DARK_RED + "Invalid format! Use DD/MM/YY format: " + RESET);
-                    continue;
-                }
-
-                // Ensure month is between 1 and 12
-                if (inputMonth < 1 || inputMonth > 12) {
-                    System.out.print(DARK_RED + "Invalid month! Use DD/MM/YY format: " + RESET);
-                    continue;
-                }
-
-                // Ensure year is between 00 and 99
-                if (inputYear < 0 || inputYear > 99) {
-                    System.out.print(DARK_RED + "Invalid year! Use DD/MM/YY format: " + RESET);
-                    continue;
-                }
-
-                inputYear += 2000; // Converts to full year: 25 -> 2025
-                int daysInMonth = YearMonth.of(inputYear, inputMonth).lengthOfMonth();
-
-                // Check if the day is valid for the given month
-                if (inputDay >= 1 && inputDay <= daysInMonth) {
-                    taskDate = LocalDate.of(inputYear, inputMonth, inputDay);
-                } else {
-                    System.out.print(DARK_RED + "Invalid date! Please use valid date: " + RESET);
-                }
-
-            } catch (NumberFormatException e) {
-                System.out.print(DARK_RED + "Invalid numbers! Use DD/MM/YY format: " + RESET);
+            if (inputMonth < 1 || inputMonth > 12) {
+                System.out.print(DARK_RED + "Invalid month! Use DD/MM/YY format: " + RESET);
+                return null;
             }
+
+            if (inputYear < 0 || inputYear > 99) {
+                System.out.print(DARK_RED + "Invalid year! Use DD/MM/YY format: " + RESET);
+                return null;
+            }
+
+            inputYear += 2000;
+            int daysInMonth = YearMonth.of(inputYear, inputMonth).lengthOfMonth();
+
+            if (inputDay < 1 || inputDay > daysInMonth) {
+                System.out.print(DARK_RED + "Invalid day for given month/year. " + RESET);
+                return null;
+            }
+
+            return LocalDate.of(inputYear, inputMonth, inputDay);
+
+        } catch (Exception e) {
+            System.out.print(DARK_RED + "Invalid input! Use DD/MM/YY format with numbers. " + RESET);
+            return null;
         }
-        return taskDate;
     }
+
+
 
 
     // Add a task to a specific date
@@ -201,37 +193,39 @@ public class TaskCalendar {
 
         System.out.println(BOLD + YELLOW + "======== TASK CREATION ========" + RESET);
         System.out.print("Enter date (DD/MM/YY or D/M/YY) to add task: ");
-        String input = scanner.nextLine().trim();
-        taskDate = stringToLocalDate(input);
 
-
-
-        // prompt for task type and information
-        System.out.println("1) Academic");
-        System.out.println("2) Social & Personal");
-        System.out.println("3) Health & Wellbeing");
-
-        while (taskType.isEmpty()) {
-            System.out.print("Enter task type: ");
-            switch (scanner.nextLine().trim()) {
-                case "1" -> taskType = "Academic";
-                case "2" -> taskType = "Social & Personal";
-                case "3" -> taskType = "Health & Wellbeing";
-                default -> System.out.println(DARK_RED + "Invalid choice!" + RESET);
-            }
+        while (taskDate == null) {
+            String input = scanner.nextLine().trim();
+            taskDate = stringToLocalDate(input);
         }
 
-        // Task description
-        System.out.println("Enter task info: ");
-        while (taskInfo.trim().isEmpty()) {
-            taskInfo = scanner.nextLine().trim();
-            if (taskInfo.isEmpty()) {
-                System.out.print(DARK_RED + "Task info cannot be empty. Please enter some information: " + RESET);
+            // prompt for task type and information
+            System.out.println("1) Academic");
+            System.out.println("2) Social & Personal");
+            System.out.println("3) Health & Wellbeing");
+
+            while (taskType.isEmpty()) {
+                System.out.print("Enter task type: ");
+                switch (scanner.nextLine().trim()) {
+                    case "1" -> taskType = "Academic";
+                    case "2" -> taskType = "Social & Personal";
+                    case "3" -> taskType = "Health & Wellbeing";
+                    default -> System.out.println(DARK_RED + "Invalid choice!" + RESET);
+                }
             }
+
+            // Task description
+            System.out.println("Enter task info: ");
+            while (taskInfo.trim().isEmpty()) {
+                taskInfo = scanner.nextLine().trim();
+                if (taskInfo.isEmpty()) {
+                    System.out.print(DARK_RED + "Task info cannot be empty. Please enter some information: " + RESET);
+                }
+            }
+
+            saveTask(userID, taskDate, taskType, taskInfo);
         }
 
-        saveTask(userID, taskDate, taskType, taskInfo);
-    }
 
     // Save the task to the file
     public void saveTask(int userID, LocalDate taskDate, String type, String info) {

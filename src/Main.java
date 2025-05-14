@@ -11,6 +11,10 @@ username2 password2
 public class Main {
     public static void main(String[] args) {
 
+        System.out.println("SEQUENCE: main started");
+        GUI gui = new GUI();
+        System.out.println("SEQUENCE: main finished");
+
         //COLOURS
         String RESET = "\u001B[0m";
         String DARK_RED = "\033[0;31m";
@@ -46,11 +50,12 @@ public class Main {
         calendar.displayCalendar();
 
         // calendar options
-        System.out.println("1) Previous month");
-        System.out.println("2) Next month");
-        System.out.println("3) Tasks");
-        System.out.println("4) Exit");
+
         while (!exit) {
+            System.out.println("1) Previous month");
+            System.out.println("2) Next month");
+            System.out.println("3) Tasks");
+            System.out.println("4) Exit");
             System.out.print("Choose an option: ");
             String choice = scanner.nextLine().trim();
 

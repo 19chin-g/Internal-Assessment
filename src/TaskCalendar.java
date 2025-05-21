@@ -143,7 +143,7 @@ public class TaskCalendar {
                 int inputMonth = Integer.parseInt(dateParts[1]);
                 int inputYear = Integer.parseInt(dateParts[2]);
 
-                // ensure each part has at most 2 digits
+                // Ensure each part has at most 2 digits
                 if (dateParts[0].length() > 2 || dateParts[1].length() > 2 || dateParts[2].length() > 2) {
                     System.out.print(DARK_RED + "Invalid format! Use DD/MM/YY format: " + RESET);
                     continue;
@@ -161,7 +161,7 @@ public class TaskCalendar {
                     continue;
                 }
 
-                inputYear += 2000; // converts to full year: 25 -> 2025
+                inputYear += 2000; // Converts to full year: 25 -> 2025
                 int daysInMonth = YearMonth.of(inputYear, inputMonth).lengthOfMonth();
 
                 // Check if the day is valid for the given month
@@ -193,7 +193,7 @@ public class TaskCalendar {
             }
         }
 
-        // task description
+        // Task description
         System.out.println("Enter task info: ");
         while (taskInfo.trim().isEmpty()) {
             taskInfo = scanner.nextLine().trim();
@@ -205,7 +205,7 @@ public class TaskCalendar {
         saveTask(userID, taskDate, taskType, taskInfo);
     }
 
-    // save the task to the file
+    // Save the task to the file
     public void saveTask(int userID, LocalDate taskDate, String type, String info) {
         String taskData = userID + " ; " + taskDate.toString() + " ; " + type + " ; " + info; // format it
         taskFile.addRecord(taskData);  // store in the text file
@@ -213,7 +213,7 @@ public class TaskCalendar {
     }
 
 
-
+    // Navigate to the previous month
     public void prevMonth() {
         if (month == 1) {
             month = 12;
@@ -223,6 +223,7 @@ public class TaskCalendar {
         }
     }
 
+    // Navigate to the next month
     public void nextMonth() {
         if (month == 12) {
             month = 1;

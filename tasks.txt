@@ -1,0 +1,3 @@
+0 ; 2025-05-12 ; Academic ; Exam results
+1 ; 2025-05-01 ; Academic ; school
+0 ; 2025-05-09 ; Academic ; EE day

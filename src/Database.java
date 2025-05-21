@@ -38,6 +38,7 @@ public class Database {
     public void removeRecord(int recordNum) {
         List<String> records = readAllRecords();
         if (recordNum < 0 || recordNum >= records.size()) {
+            System.out.println(recordNum);
             System.out.println("Invalid record number!");
             return;
         }

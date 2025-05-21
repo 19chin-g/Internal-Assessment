@@ -1,6 +1,3 @@
 0 ; 2025-05-12 ; Academic ; Exam results
 1 ; 2025-05-01 ; Academic ; school
 0 ; 2025-05-09 ; Academic ; EE day
-2 ; 2001-01-01 ; Social & Personal ; 213
-2 ; 2028-02-29 ; Social & Personal ; 313
-2 ; 2025-05-14 ; Health & Wellbeing ; a

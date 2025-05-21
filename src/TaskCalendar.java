@@ -132,11 +132,43 @@ public class TaskCalendar {
             int recordNum = 0;
             if (records != null) {
                 for (String record : records) {
-                    recordNum++;
+
                     String[] taskDetails = record.split(" ; "); // userID ; date ; type ; info
                     if (taskDetails.length >= 3 && taskDetails[0].equals(String.valueOf(userID)) && taskDetails[1].equals(taskDate.toString())) {
                         taskFile.removeRecord(recordNum);
                         System.out.println(GREEN + "Task removed successfully." + RESET);
+                    }
+                    recordNum++;
+
+                }
+            }
+        } else {
+            System.out.println(DARK_RED + "No tasks on specified date." + RESET);
+        }
+    }
+/*
+    public void viewTask() {
+        Scanner scanner = new Scanner(System.in);
+        LocalDate taskDate = null;
+        while (taskDate == null) {
+            System.out.print("Enter date (DD/MM/YY or D/M/YY) of task: ");
+            String input = scanner.nextLine().trim();
+            taskDate = stringToLocalDate(input);
+        }
+
+        if (hasTask(userID, taskDate)) {
+            ArrayList<String> records = taskFile.readAllRecords();
+            int recordNum = 0;
+            if (records != null) {
+                for (String record : records) {
+                    recordNum++;
+                    String[] taskDetails = record.split(" ; "); // userID ; date ; type ; info
+                    if (taskDetails.length >= 3 && taskDetails[0].equals(String.valueOf(userID)) && taskDetails[1].equals(taskDate.toString())) {
+
+                        System.out.println(GREEN + "Task date: " + RESET + taskDetails[1]);
+                        System.out.println(GREEN + "Task type: " + RESET + taskDetails[2]);
+                        System.out.println(GREEN + "Task info: " + RESET + taskDetails[3]);
+
                     }
 
                 }
@@ -145,6 +177,29 @@ public class TaskCalendar {
             System.out.println("No tasks on specified date.");
         }
     }
+
+*/
+    public void viewTask() {
+        ArrayList<String> records = taskFile.readAllRecords();
+        ArrayList<String> tasks = new ArrayList<>();
+        if (records != null) {
+            for (String record : records) {
+                String[] taskDetails = record.split(" ; "); // userID ; date ; type ; info
+                if (taskDetails[0].equals(String.valueOf(userID))) {
+                    tasks.add(record);
+                    System.out.print(GREEN + "Task date: " + RESET + taskDetails[1] + " ");
+                    System.out.print(GREEN + "Task type: " + RESET + taskDetails[2] + " ");
+                    System.out.println(GREEN + "Task info: " + RESET + taskDetails[3] + " ");
+
+                }
+
+            }
+            if (tasks.isEmpty() ) {
+                System.out.println(DARK_RED + "No tasks found." + RESET);
+            }
+        }
+    }
+
 
 
     public LocalDate stringToLocalDate(String date) {

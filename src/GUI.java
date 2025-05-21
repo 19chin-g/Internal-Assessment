@@ -25,7 +25,7 @@ public class GUI extends JFrame {
         buttonOK = new JButton("");
         buttonOK.setBounds(150, 130, 100, WIDGET_HEIGHT);
 
-        buttonOK.addActionListener(buttonOK);
+        //buttonOK.addActionListener(buttonOK);
 
 
 

@@ -10,7 +10,7 @@ public class Database {
     }
 
 
-    // Read all records from the file and return them as a list of strings
+    // read all records from the file and return them as list of strings
     public ArrayList<String> readAllRecords() {
         ArrayList<String> records = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
@@ -34,14 +34,14 @@ public class Database {
         }
     }
 
-    // Remove a specific record (task) from the file
+    // remove a specific record  from the file
     public void removeRecord(int recordNum) {
         List<String> records = readAllRecords();
         if (recordNum < 0 || recordNum >= records.size()) {
             System.out.println("Invalid record number!");
             return;
         }
-        records.remove(recordNum); // Remove the specified record
+        records.remove(recordNum);
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
             for (String record : records) {

@@ -12,11 +12,15 @@ public class Main {
     public static void main(String[] args) {
 
 
+
         System.out.println("SEQUENCE: main started");
         GUI gui = new GUI();
         System.out.println("SEQUENCE: main finished");
-        /*
 
+
+
+
+        /*
         //COLOURS
         String RESET = "\u001B[0m";
         String DARK_RED = "\033[0;31m";
@@ -96,6 +100,7 @@ public class Main {
 
         }
 
-         */
+        */
     }
 }
+

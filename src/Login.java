@@ -14,19 +14,21 @@ public class Login {
         loginFile = new Database(filename);
     }
 
-    // check if user exists in database
+
     public boolean findUser(String username, String password) {
         ArrayList<String> records = loginFile.readAllRecords();
+        userID = 0;
 
         for (String record : records) {
-            String[] userInfo = record.split(" ");  // Split record into username and password
+            String[] userInfo = record.split(" ");
             if (userInfo[0].equals(username) && userInfo[1].equals(password)) {
                 return true;
             }
-            userID ++;
+            userID++;
         }
         return false;
     }
+
 
     // check if username is already taken
     public boolean isUserTaken(String username) {
@@ -60,6 +62,10 @@ public class Login {
             return false;
         }
     }
+
+
+
+
 
     // register a new user
     public void register() {

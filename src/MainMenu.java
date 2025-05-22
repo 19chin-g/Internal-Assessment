@@ -1,9 +1,10 @@
+import java.time.LocalDate;
 import javax.swing.*;
 import java.awt.*;
 
 public class MainMenu extends JFrame {
     private final int WIDGET_HEIGHT = 30;
-    private int userID;  // store logged-in user ID
+    private int userID;  // store logged in user ID
 
     public MainMenu(int userID) {
         this.userID = userID;
@@ -49,8 +50,12 @@ public class MainMenu extends JFrame {
 
         setVisible(true);
 
+        LocalDate today = LocalDate.now();
+        TaskCalendar calendar = new TaskCalendar(userID, today.getDayOfMonth(), today.getMonthValue(), today.getYear(), "tasks.txt");
+
         addTaskButton.addActionListener(e -> {
             System.out.println("Add Task " + userID);
+            calendar.addTask();
 
         });
 

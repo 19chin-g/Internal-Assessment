@@ -6,11 +6,11 @@ public class GUI extends JFrame {
     private JPasswordField textPassword;
     private JButton buttonOK;
 
-    private final int WIDGET_HEIGHT = 30;
-    private Login login;  // Reference to your login system
+    private final int WIDGET_HEIGHT = 35;
+    private Login login;
 
     public GUI() {
-        login = new Login("users.txt");  // replace with your actual filename
+        login = new Login("users.txt");
 
         setTitle("Study Planner IA");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -21,31 +21,34 @@ public class GUI extends JFrame {
         // TITLE
         JLabel title = new JLabel("Study Planner");
         title.setBounds(250, 30, 300, WIDGET_HEIGHT);
-        title.setFont(new Font("Arial", Font.BOLD, 28));
+        title.setFont(new Font("Century Gothic", Font.BOLD, 28));
         add(title);
 
         // USERNAME LABEL AND TEXT FIELD
         JLabel labelUsername = new JLabel("Username:");
         labelUsername.setBounds(170, 90, 80, WIDGET_HEIGHT);
+        labelUsername.setFont(new Font("Century Gothic", Font.BOLD, 12));
         add(labelUsername);
 
         textUsername = new JTextField();
-        textUsername.setBounds(260, 90, 200, WIDGET_HEIGHT);
+        textUsername.setBounds(250, 90, 200, WIDGET_HEIGHT);
         add(textUsername);
 
         // PASSWORD LABEL AND TEXT FIELD
         JLabel labelPassword = new JLabel("Password:");
         labelPassword.setBounds(170, 140, 80, WIDGET_HEIGHT);
+        labelPassword.setFont(new Font("Century Gothic", Font.BOLD, 12));
         add(labelPassword);
 
         textPassword = new JPasswordField();
-        textPassword.setBounds(260, 140, 200, WIDGET_HEIGHT);
+        textPassword.setBounds(250, 140, 200, WIDGET_HEIGHT);
         textPassword.setEchoChar('*');  // turns letters into asterisk
         add(textPassword);
 
         // SHOW PASSWORD CHECKBOX
         JCheckBox showPassword = new JCheckBox("Show Password");
-        showPassword.setBounds(260, 175, 150, 20);
+        showPassword.setFont(new Font("Century Gothic", Font.BOLD, 12));
+        showPassword.setBounds(250, 180, 200, WIDGET_HEIGHT);
         add(showPassword);
 
         showPassword.addActionListener(e -> {
@@ -56,9 +59,9 @@ public class GUI extends JFrame {
             }
         });
 
-        // Log in button
+        // LOG IN BUTTON
         buttonOK = new JButton("Log in");
-        buttonOK.setBounds(300, 210, 100, WIDGET_HEIGHT);
+        buttonOK.setBounds(300, 220, 100, WIDGET_HEIGHT);
         add(buttonOK);
         showPassword.setFocusable(false);
 

@@ -32,7 +32,7 @@ public class TaskCalendar {
     }
 
 
-
+    /*
     // Create the calendar
     public ArrayList<ArrayList<Integer>> createCalendar() {
         ArrayList<ArrayList<Integer>> monthList = new ArrayList<>();
@@ -58,6 +58,7 @@ public class TaskCalendar {
 
         return monthList;
     }
+
 
     // Display the calendar with tasks highlighted
     public void displayCalendar() {
@@ -146,7 +147,7 @@ public class TaskCalendar {
             System.out.println(DARK_RED + "No tasks on specified date." + RESET);
         }
     }
-    /*
+
         public void viewTask() {
             Scanner scanner = new Scanner(System.in);
             LocalDate taskDate = null;

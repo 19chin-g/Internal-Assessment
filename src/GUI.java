@@ -42,12 +42,13 @@ public class GUI extends JFrame {
 
         textPassword = new JPasswordField();
         textPassword.setBounds(250, 140, 200, WIDGET_HEIGHT);
-        textPassword.setEchoChar('*');  // turns letters into asterisk
+        //textPassword.setEchoChar('•');  // turns letters into asterisk
         add(textPassword);
 
         // SHOW PASSWORD CHECKBOX
         JCheckBox showPassword = new JCheckBox("Show Password");
         showPassword.setFont(new Font("Century Gothic", Font.BOLD, 12));
+
         showPassword.setBounds(250, 180, 200, WIDGET_HEIGHT);
         add(showPassword);
 
@@ -55,7 +56,7 @@ public class GUI extends JFrame {
             if (showPassword.isSelected()) {
                 textPassword.setEchoChar((char) 0);  // Show password
             } else {
-                textPassword.setEchoChar('*');  // Hide password
+                textPassword.setEchoChar('\u2022');  // Hide password
             }
         });
 

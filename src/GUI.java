@@ -5,6 +5,7 @@ public class GUI extends JFrame {
     private JTextField textUsername;
     private JPasswordField textPassword;
     private JButton buttonOK;
+    private int fontSize = 14;
 
     private final int WIDGET_HEIGHT = 35;
     private Login login;
@@ -27,7 +28,7 @@ public class GUI extends JFrame {
         // USERNAME LABEL AND TEXT FIELD
         JLabel labelUsername = new JLabel("Username:");
         labelUsername.setBounds(170, 90, 80, WIDGET_HEIGHT);
-        labelUsername.setFont(new Font("Century Gothic", Font.BOLD, 12));
+        labelUsername.setFont(new Font("Century Gothic", Font.BOLD, fontSize));
         add(labelUsername);
 
         textUsername = new JTextField();
@@ -37,17 +38,16 @@ public class GUI extends JFrame {
         // PASSWORD LABEL AND TEXT FIELD
         JLabel labelPassword = new JLabel("Password:");
         labelPassword.setBounds(170, 140, 80, WIDGET_HEIGHT);
-        labelPassword.setFont(new Font("Century Gothic", Font.BOLD, 12));
+        labelPassword.setFont(new Font("Century Gothic", Font.BOLD, fontSize));
         add(labelPassword);
 
         textPassword = new JPasswordField();
         textPassword.setBounds(250, 140, 200, WIDGET_HEIGHT);
-        //textPassword.setEchoChar('•');  // turns letters into asterisk
         add(textPassword);
 
         // SHOW PASSWORD CHECKBOX
         JCheckBox showPassword = new JCheckBox("Show Password");
-        showPassword.setFont(new Font("Century Gothic", Font.BOLD, 12));
+        showPassword.setFont(new Font("Century Gothic", Font.BOLD, fontSize));
 
         showPassword.setBounds(250, 180, 200, WIDGET_HEIGHT);
         add(showPassword);
@@ -56,7 +56,7 @@ public class GUI extends JFrame {
             if (showPassword.isSelected()) {
                 textPassword.setEchoChar((char) 0);  // Show password
             } else {
-                textPassword.setEchoChar('\u2022');  // Hide password
+                textPassword.setEchoChar('•');  // Hide password
             }
         });
 
@@ -72,7 +72,7 @@ public class GUI extends JFrame {
             String username = textUsername.getText().trim();
             String password = new String(textPassword.getPassword()).trim();
 
-            // if user foundn in database then login
+            // if user found in database then login
             if (login.findUser(username, password)) {
                 int userID = login.getUserID();
                 JOptionPane.showMessageDialog(this,
@@ -86,6 +86,31 @@ public class GUI extends JFrame {
             }
         });
 
+        // SIGN UP BUTTON
+        buttonOK = new JButton("Sign up");
+        buttonOK.setBounds(300, 260, 100, WIDGET_HEIGHT);
+        add(buttonOK);
+        showPassword.setFocusable(false);
+
+
+        buttonOK.addActionListener(e -> {
+            // stores username and password
+            String username = textUsername.getText().trim();
+            String password = new String(textPassword.getPassword()).trim();
+
+            // if user found in database then login
+            if (!login.isUserTaken(username)) {
+                JOptionPane.showMessageDialog(this,
+                        "Sign up successful!",
+                        "Sign up Successful", JOptionPane.INFORMATION_MESSAGE);
+
+            } else {
+                JOptionPane.showMessageDialog(this,
+                        "Username has been taken!",
+                        "Sign up Failed", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
         setVisible(true);
     }
 
@@ -95,6 +120,10 @@ public class GUI extends JFrame {
 
         new MainMenu(userID);
     }
+
+
+
+
 
     // Entry point for testing
     public static void main(String[] args) {

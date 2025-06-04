@@ -99,15 +99,20 @@ public class GUI extends JFrame {
             String password = new String(textPassword.getPassword()).trim();
 
             // if user found in database then login
-            if (!login.isUserTaken(username)) {
-                JOptionPane.showMessageDialog(this,
-                        "Sign up successful!",
-                        "Sign up Successful", JOptionPane.INFORMATION_MESSAGE);
-
-            } else {
+            if (login.isUserTaken(username)) {
                 JOptionPane.showMessageDialog(this,
                         "Username has been taken!",
                         "Sign up Failed", JOptionPane.ERROR_MESSAGE);
+
+
+            } else if (username.isBlank() || password.isBlank()) {
+                JOptionPane.showMessageDialog(this,
+                        "Enter username or password",
+                        "Sign up Failed", JOptionPane.ERROR_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this,
+                        "Sign up successful!",
+                        "Sign up Successful", JOptionPane.INFORMATION_MESSAGE);
             }
         });
 

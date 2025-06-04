@@ -23,17 +23,16 @@ public class TaskCalendar {
     String BOLD = "\033[1m";
 
 
-    public TaskCalendar(int userID, int day, int month, int year, String filename) {
+    public TaskCalendar(int year, int month) {
         this.userID = userID;
         this.day = day;
         this.month = month;
         this.year = year;
-        this.taskFile = new Database(filename);
+        //this.taskFile = new Database(filename);
     }
 
 
-    /*
-    // Create the calendar
+
     public ArrayList<ArrayList<Integer>> createCalendar() {
         ArrayList<ArrayList<Integer>> monthList = new ArrayList<>();
         for (int rows = 0; rows < 6; rows++) {
@@ -42,16 +41,16 @@ public class TaskCalendar {
 
         LocalDate selectedMonth = LocalDate.of(year, month, 1);
         int monthLength = selectedMonth.lengthOfMonth();
-        int startDay = selectedMonth.getDayOfWeek().getValue();
+        int startDay = selectedMonth.getDayOfWeek().getValue(); // 1 (Mon) to 7 (Sun)
 
         for (int i = 1; i < startDay; i++) {
-            monthList.get(0).add(null);
+            monthList.get(0).add(null); // fill in empty cells
         }
 
         int nextList = 0;
         for (int day = 1; day <= monthLength; day++) {
             monthList.get(nextList).add(day);
-            if ((day + startDay) % 7 == 1) {
+            if ((day + startDay - 1) % 7 == 0) {
                 nextList++;
             }
         }
@@ -59,7 +58,7 @@ public class TaskCalendar {
         return monthList;
     }
 
-
+/*
     // Display the calendar with tasks highlighted
     public void displayCalendar() {
         ArrayList<ArrayList<Integer>> monthList = createCalendar();

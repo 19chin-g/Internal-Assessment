@@ -113,6 +113,7 @@ public class GUI extends JFrame {
                 JOptionPane.showMessageDialog(this,
                         "Sign up successful!",
                         "Sign up Successful", JOptionPane.INFORMATION_MESSAGE);
+                login.register(username, password);
             }
         });
 

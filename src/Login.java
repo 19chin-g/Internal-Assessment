@@ -68,13 +68,8 @@ public class Login {
 
 
     // register a new user
-    public void register() {
-        Scanner scanner = new Scanner(System.in);
-        String username = "";
-        String password = "";
-
-        System.out.println(BOLD + YELLOW + "======== REGISTER ========" + RESET);
-
+    public void register(String username, String password) {
+/*
         while (username.isBlank() || isUserTaken(username) || username.contains(" ")) {
             System.out.print("Enter a username: ");
             username = scanner.nextLine().trim();
@@ -99,9 +94,9 @@ public class Login {
             }
         }
 
+*/
         User user = new User(username, password);
         loginFile.addRecord(user.toString());  // Append user to the file
-        System.out.println("User registered successfully.");
     }
 
     public int getUserID() {

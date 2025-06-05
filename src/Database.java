@@ -29,6 +29,7 @@ public class Database {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename, true))) {
             writer.write(data);
             writer.newLine();
+            writer.flush();
         } catch (IOException e) {
             System.out.println("Error writing to file");
         }

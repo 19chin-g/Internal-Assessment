@@ -81,19 +81,14 @@ public class MainMenu extends JFrame {
         calendarPanel.repaint();
         }
     }
-
-
-
 /*
-    public MainMenu(int userID) {
-        this.userID = userID;
 
-        setTitle("Main Menu");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(700, 400);
-        setLayout(null);
-        setLocationRelativeTo(null);
 
+    setTitle("Main Menu");
+    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    setSize(700, 400);
+    setLayout(null);
+    setLocationRelativeTo(null);
         // TITLE
         JLabel title = new JLabel("Main Menu");
         title.setBounds(280, 50, 200, WIDGET_HEIGHT);

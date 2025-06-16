@@ -1,5 +1,8 @@
 import java.time.*;
 import java.util.*;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 
 public class TaskCalendar {
     int userID;
@@ -31,6 +34,28 @@ public class TaskCalendar {
         //this.taskFile = new Database(filename);
     }
 
+    public JPanel getCalendarPanel() {
+        ArrayList<ArrayList<Integer>> calendarData = createCalendar();
+        JPanel calendarPanel = new JPanel(new GridLayout(6, 7, 5, 5)); // 6 rows x 7 days
+
+        for (ArrayList<Integer> week : calendarData) {
+            for (Integer day : week) {
+                if (day == null) {
+                    calendarPanel.add(new JLabel("")); // empty cell
+                } else {
+                    JButton dayButton = new JButton(String.valueOf(day));
+                    dayButton.addActionListener(e -> {
+                        // Replace this with what you want to do
+                        JOptionPane.showMessageDialog(null, "You clicked on day " + day);
+                        // Optional: open task view / create task
+                    });
+                    calendarPanel.add(dayButton);
+                }
+            }
+        }
+
+        return calendarPanel;
+    }
 
 
     public ArrayList<ArrayList<Integer>> createCalendar() {

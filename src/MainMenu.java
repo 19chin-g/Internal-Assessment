@@ -28,7 +28,7 @@ public class MainMenu extends JFrame {
 
 
         setTitle("Study Planner Calendar");
-        setSize(400, 300);
+        setSize(700, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
@@ -44,8 +44,16 @@ public class MainMenu extends JFrame {
         // Calendar panel
         calendarPanel = new JPanel(new GridLayout(7, 7)); // 7x7: header + 6 weeks
         add(calendarPanel, BorderLayout.CENTER);
+        TaskCalendar tc = new TaskCalendar(2025, 6); // example year/month
+        JPanel calendarPanel = tc.getCalendarPanel();
 
-        updateCalendar(currentDate.getYear(), currentDate.getMonthValue());
+        JFrame frame = new JFrame("Task Calendar");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(600, 400);
+        frame.add(calendarPanel);
+        frame.setVisible(true);
+
+        //updateCalendar(currentDate.getYear(), currentDate.getMonthValue());
         setVisible(true);
     }
 

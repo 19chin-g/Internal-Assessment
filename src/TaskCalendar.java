@@ -36,18 +36,20 @@ public class TaskCalendar {
 
     public JPanel getCalendarPanel() {
         ArrayList<ArrayList<Integer>> calendarData = createCalendar();
-        JPanel calendarPanel = new JPanel(new GridLayout(6, 7, 5, 5)); // 6 rows x 7 days
+        System.out.println(calendarData);
+        JPanel calendarPanel = new JPanel(new GridLayout(6, 12, 10, 10)); //
 
         for (ArrayList<Integer> week : calendarData) {
             for (Integer day : week) {
+                System.out.println(day + " " + week);
                 if (day == null) {
-                    calendarPanel.add(new JLabel("")); // empty cell
+                    calendarPanel.add(new JLabel("blank")); // empty cell
                 } else {
                     JButton dayButton = new JButton(String.valueOf(day));
                     dayButton.addActionListener(e -> {
-                        // Replace this with what you want to do
                         JOptionPane.showMessageDialog(null, "You clicked on day " + day);
-                        // Optional: open task view / create task
+
+                        // create task
                     });
                     calendarPanel.add(dayButton);
                 }

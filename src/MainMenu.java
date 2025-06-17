@@ -10,41 +10,22 @@ import static javax.swing.SwingConstants.CENTER;
 
 
 public class MainMenu extends JFrame {
-        private JPanel calendarPanel;
-        private JLabel monthLabel;
-        private LocalDate currentDate;
-        private int userID;  // store logged in user ID
+    private JPanel calendarPanel;
+    private JLabel monthLabel;
+    private LocalDate currentDate;
+    private int userID;  // store logged in user ID
 
 
     public MainMenu(int userID) {
 
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        int width = (int) (screenSize.width * 0.75);
-        int height = (int) (screenSize.height * 0.8);
-
-        setSize(width, height);
-        setLocation(screenSize.width - width, (screenSize.height - height) / 2);
-
-
-
-        setTitle("Study Planner Calendar");
-        setSize(700, 400);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new BorderLayout());
-
         currentDate = LocalDate.now();
 
-        // Top panel
-        JPanel topPanel = new JPanel();
-        monthLabel = new JLabel();
-        monthLabel.setFont(new Font("Century Gothic", Font.BOLD, 18));
-        topPanel.add(monthLabel);
-        add(topPanel, BorderLayout.EAST);
+
 
         // Calendar panel
         calendarPanel = new JPanel(new GridLayout(7, 7)); // 7x7: header + 6 weeks
         add(calendarPanel, BorderLayout.CENTER);
-        TaskCalendar tc = new TaskCalendar(2025, 6); // example year/month
+        TaskCalendar tc = new TaskCalendar(2025, 8); // example year/month
         JPanel calendarPanel = tc.getCalendarPanel();
 
         JFrame frame = new JFrame("Task Calendar");
@@ -56,39 +37,10 @@ public class MainMenu extends JFrame {
         //updateCalendar(currentDate.getYear(), currentDate.getMonthValue());
         setVisible(true);
     }
+}
 
-    private void updateCalendar(int year, int month) {
-        calendarPanel.removeAll();
 
-        // update month label
-        LocalDate date = LocalDate.of(year, month, 1);
-        monthLabel.setText(date.getMonth() + " " + year);
 
-        // day headers
-        String[] days = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
-        for (String day : days) {
-            JLabel label = new JLabel(day, CENTER);
-            label.setFont(new Font("Century Gothic", Font.BOLD, 12));
-            calendarPanel.add(label);
-        }
-
-        // generates a calendar
-        TaskCalendar taskCal = new TaskCalendar(year, month);
-        ArrayList<ArrayList<Integer>> calendarData = taskCal.createCalendar();
-
-        for (ArrayList<Integer> week : calendarData) {
-            for (int i = 0; i < 7; i++) {
-                Integer day = (i < week.size()) ? week.get(i) : null;
-                String text = (day == null) ? "" : String.valueOf(day);
-                JLabel label = new JLabel(text, CENTER);
-                calendarPanel.add(label);
-            }
-        }
-
-        calendarPanel.revalidate();
-        calendarPanel.repaint();
-        }
-    }
 /*
 
 

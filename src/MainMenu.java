@@ -13,19 +13,25 @@ public class MainMenu extends JFrame {
     private JPanel calendarPanel;
     private JLabel monthLabel;
     private LocalDate currentDate;
+    private int currentMonth;
+    private int currentYear;
+
+
     private int userID;  // store logged in user ID
 
 
     public MainMenu(int userID) {
 
         currentDate = LocalDate.now();
+        currentMonth = LocalDate.now().getMonthValue();
+        currentYear = LocalDate.now().getYear();
 
 
 
         // Calendar panel
         calendarPanel = new JPanel(new GridLayout(7, 7)); // 7x7: header + 6 weeks
         add(calendarPanel, BorderLayout.CENTER);
-        TaskCalendar tc = new TaskCalendar(2025, 8); // example year/month
+        TaskCalendar tc = new TaskCalendar(currentYear, currentMonth); // example year/month
         JPanel calendarPanel = tc.getCalendarPanel();
 
         JFrame frame = new JFrame("Task Calendar");

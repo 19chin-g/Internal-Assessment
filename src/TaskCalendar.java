@@ -35,57 +35,61 @@ public class TaskCalendar {
     }
 
     public JPanel getCalendarPanel() {
-        ArrayList<ArrayList<Integer>> calendarData = createCalendar();
-        System.out.println(calendarData);
-        JPanel calendarPanel = new JPanel(new GridLayout(6, 12, 10, 10)); //
+        ArrayList<ArrayList<Integer>> calendar = createCalendar();
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(7, 6)); // 7 columns for Mon–Sun
 
-        for (ArrayList<Integer> week : calendarData) {
+        String[] days = { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
+        for (String d : days) {
+            panel.add(new JLabel(d, SwingConstants.CENTER));
+        }
+
+        for (ArrayList<Integer> week : calendar) {
             for (Integer day : week) {
-                System.out.println(day + " " + week);
                 if (day == null) {
-                    calendarPanel.add(new JLabel("blank")); // empty cell
+                    panel.add(new JLabel(""));
                 } else {
-                    JButton dayButton = new JButton(String.valueOf(day));
-                    dayButton.addActionListener(e -> {
-                        JOptionPane.showMessageDialog(null, "You clicked on day " + day);
-
-                        // create task
+                    JButton button = new JButton(day.toString());
+                    button.addActionListener(e -> {
+                        System.out.println("Clicked day: " + day);
+                        // Optional: open task view or add popup
                     });
-                    calendarPanel.add(dayButton);
+                    panel.add(button);
                 }
             }
         }
 
-        return calendarPanel;
+        return panel;
     }
 
 
     public ArrayList<ArrayList<Integer>> createCalendar() {
-        ArrayList<ArrayList<Integer>> monthList = new ArrayList<>();
-        for (int rows = 0; rows < 6; rows++) {
-            monthList.add(new ArrayList<>());
-        }
+        ArrayList<ArrayList<Integer>> calendar = new ArrayList<>();
 
-        LocalDate selectedMonth = LocalDate.of(year, month, 1);
-        int monthLength = selectedMonth.lengthOfMonth();
-        int startDay = selectedMonth.getDayOfWeek().getValue(); // 1 (Mon) to 7 (Sun)
+        LocalDate firstDay = LocalDate.of(year, month, 1);
+        int daysInMonth = firstDay.lengthOfMonth();
+        int startDay = firstDay.getDayOfWeek().getValue(); // 1 (Mon) to 7 (Sun)
 
-        for (int i = 1; i < startDay; i++) {
-            monthList.get(0).add(null); // fill in empty cells
-        }
-
-        int nextList = 0;
-        for (int day = 1; day <= monthLength; day++) {
-            monthList.get(nextList).add(day);
-            if ((day + startDay - 1) % 7 == 0) {
-                nextList++;
+        int day = 1;
+        for (int week = 0; week < 6; week++) {
+            ArrayList<Integer> weekRow = new ArrayList<>();
+            for (int i = 1; i <= 7; i++) {
+                if (week == 0 && i < startDay) {
+                    weekRow.add(null);
+                } else if (day <= daysInMonth) {
+                    weekRow.add(day++);
+                } else {
+                    weekRow.add(null);
+                }
             }
+            calendar.add(weekRow);
         }
 
-        return monthList;
+        return calendar;
     }
 
-/*
+
+    /*
     // Display the calendar with tasks highlighted
     public void displayCalendar() {
         ArrayList<ArrayList<Integer>> monthList = createCalendar();

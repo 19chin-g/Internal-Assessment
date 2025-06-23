@@ -1,14 +1,20 @@
 import javax.swing.*;
 import java.awt.*;
+import java.time.LocalDate;
 
 public class GUI extends JFrame {
     private JTextField textUsername;
     private JPasswordField textPassword;
     private JButton buttonOK;
     private int fontSize = 14;
+    private JPanel calendarPanel;
+
+    private LocalDate currentDate;
+    private int currentMonth;
+    private int currentYear;
 
     private final int WIDGET_HEIGHT = 35;
-    private Login login;
+    private final Login login;
 
     public GUI() {
         login = new Login("users.txt");
@@ -48,6 +54,7 @@ public class GUI extends JFrame {
         // SHOW PASSWORD CHECKBOX
         JCheckBox showPassword = new JCheckBox("Show Password");
         showPassword.setFont(new Font("Century Gothic", Font.BOLD, fontSize));
+        showPassword.setFocusable(false);
 
         showPassword.setBounds(250, 180, 200, WIDGET_HEIGHT);
         add(showPassword);
@@ -64,7 +71,6 @@ public class GUI extends JFrame {
         buttonOK = new JButton("Log in");
         buttonOK.setBounds(300, 220, 100, WIDGET_HEIGHT);
         add(buttonOK);
-        showPassword.setFocusable(false);
 
 
         buttonOK.addActionListener(e -> {
@@ -76,8 +82,9 @@ public class GUI extends JFrame {
             if (login.findUser(username, password)) {
                 int userID = login.getUserID();
                 JOptionPane.showMessageDialog(this,
-                        "Login successful! Welcome, " +  username,
+                        "Login successful! Welcome, " + username,
                         "Login Successful", JOptionPane.INFORMATION_MESSAGE);
+
                 openMainMenu(userID);
             } else {
                 JOptionPane.showMessageDialog(this,
@@ -90,7 +97,6 @@ public class GUI extends JFrame {
         buttonOK = new JButton("Sign up");
         buttonOK.setBounds(300, 260, 100, WIDGET_HEIGHT);
         add(buttonOK);
-        showPassword.setFocusable(false);
 
 
         buttonOK.addActionListener(e -> {
@@ -116,16 +122,52 @@ public class GUI extends JFrame {
                 login.register(username, password);
             }
         });
-
         setVisible(true);
     }
 
     private void openMainMenu(int userID) {
-        dispose();
-        System.out.println("Logged in " + userID);
+        currentDate = LocalDate.now();
+        currentMonth = currentDate.getMonthValue();
+        currentYear = currentDate.getYear();
 
-        new MainMenu(userID);
+        TaskCalendar tc = new TaskCalendar(currentYear, currentMonth);
+        JPanel calendarPanel = tc.getCalendarPanel();
+
+        // Title label
+        JLabel title = new JLabel("Welcome, User " + userID + " - " + currentDate.getMonth() + " " + currentYear);
+        title.setFont(new Font("Century Gothic", Font.BOLD, 20));
+        title.setHorizontalAlignment(SwingConstants.CENTER);
+
+        // Logout button
+        JButton logoutButton = new JButton("Log Out");
+        logoutButton.setFont(new Font("Century Gothic", Font.PLAIN, 14));
+        logoutButton.addActionListener(e -> {
+            // Go back to login screen
+            getContentPane().removeAll();
+            repaint();
+            revalidate();
+            new GUI(); // Create a fresh login screen
+            dispose(); // Close current calendar window
+        });
+
+        // Top panel with title and logout
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.add(title, BorderLayout.CENTER);
+        topPanel.add(logoutButton, BorderLayout.EAST);
+
+        // Wrap everything
+        JPanel wrapper = new JPanel(new BorderLayout());
+        wrapper.add(topPanel, BorderLayout.NORTH);
+        wrapper.add(calendarPanel, BorderLayout.CENTER);
+
+        setContentPane(wrapper);
+        pack();
+        setLocationRelativeTo(null);
     }
+
+
+
+
 
 
 

@@ -85,7 +85,7 @@ public class GUI extends JFrame {
                         "Login successful! Welcome, " + username,
                         "Login Successful", JOptionPane.INFORMATION_MESSAGE);
 
-                openMainMenu(userID);
+                openMainMenu(userID); // logs in
             } else {
                 JOptionPane.showMessageDialog(this,
                         "Invalid username or password.",
@@ -98,19 +98,14 @@ public class GUI extends JFrame {
         buttonOK.setBounds(300, 260, 100, WIDGET_HEIGHT);
         add(buttonOK);
 
-
         buttonOK.addActionListener(e -> {
-            // stores username and password
             String username = textUsername.getText().trim();
             String password = new String(textPassword.getPassword()).trim();
 
-            // if user found in database then login
             if (login.isUserTaken(username)) {
                 JOptionPane.showMessageDialog(this,
                         "Username has been taken!",
                         "Sign up Failed", JOptionPane.ERROR_MESSAGE);
-
-
             } else if (username.isBlank() || password.isBlank()) {
                 JOptionPane.showMessageDialog(this,
                         "Enter username or password",
@@ -122,6 +117,8 @@ public class GUI extends JFrame {
                 login.register(username, password);
             }
         });
+
+        setLocationRelativeTo(null);
         setVisible(true);
     }
 
@@ -133,37 +130,57 @@ public class GUI extends JFrame {
         TaskCalendar tc = new TaskCalendar(currentYear, currentMonth);
         JPanel calendarPanel = tc.getCalendarPanel();
 
-        // Title label
-        JLabel title = new JLabel("Welcome, User " + userID + " - " + currentDate.getMonth() + " " + currentYear);
+        // Title and logout
+        JLabel title = new JLabel(currentDate.getMonth() + " " + currentYear);
         title.setFont(new Font("Century Gothic", Font.BOLD, 20));
         title.setHorizontalAlignment(SwingConstants.CENTER);
 
-        // Logout button
         JButton logoutButton = new JButton("Log Out");
-        logoutButton.setFont(new Font("Century Gothic", Font.PLAIN, 14));
+        logoutButton.setFont(new Font("Century Gothic", Font.BOLD, 12));
+        setFocusable(false);
         logoutButton.addActionListener(e -> {
-            // Go back to login screen
             getContentPane().removeAll();
             repaint();
             revalidate();
-            new GUI(); // Create a fresh login screen
-            dispose(); // Close current calendar window
+            new GUI();
+            dispose();
         });
 
-        // Top panel with title and logout
+
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.add(title, BorderLayout.CENTER);
         topPanel.add(logoutButton, BorderLayout.EAST);
 
-        // Wrap everything
-        JPanel wrapper = new JPanel(new BorderLayout());
-        wrapper.add(topPanel, BorderLayout.NORTH);
-        wrapper.add(calendarPanel, BorderLayout.CENTER);
+        // SIDE PANEL
+        JPanel sidePanel = new JPanel();
+        sidePanel.setLayout(new BoxLayout(sidePanel, BoxLayout.Y_AXIS)); // Vertical layout
+        sidePanel.setBackground(new Color(230, 230, 250));
+        sidePanel.setPreferredSize(new Dimension(getWidth()/5, getHeight()));
 
-        setContentPane(wrapper);
-        pack();
-        setLocationRelativeTo(null);
+        // Sidebar buttons
+        JButton tasksBtn = new JButton("My Tasks");
+        JButton todayBtn = new JButton("Study Timer");
+
+
+        for (JButton btn : new JButton[]{todayBtn, tasksBtn}) {
+            btn.setAlignmentX(Component.CENTER_ALIGNMENT);
+            btn.setMaximumSize(new Dimension(120, 30));
+            sidePanel.add(Box.createRigidArea(new Dimension(0, 20)));
+            sidePanel.add(btn);
+        }
+
+        // Final layout
+        JPanel mainContent = new JPanel(new BorderLayout());
+        mainContent.add(topPanel, BorderLayout.NORTH);
+        mainContent.add(calendarPanel, BorderLayout.CENTER);
+        mainContent.add(sidePanel, BorderLayout.WEST);
+
+        setContentPane(mainContent);
+        revalidate();
+        repaint();
     }
+
+
 
 
 

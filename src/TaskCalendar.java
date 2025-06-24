@@ -37,7 +37,7 @@ public class TaskCalendar {
     public JPanel getCalendarPanel() {
         ArrayList<ArrayList<Integer>> calendar = createCalendar();
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(7, 6)); // 7 columns for Mon–Sun
+        panel.setLayout(new GridLayout(7, 7)); // 7 columns for Mon–Sun
 
         String[] days = { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
         for (String d : days) {

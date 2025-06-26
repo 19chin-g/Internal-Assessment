@@ -29,14 +29,13 @@ public class MainMenu extends JFrame {
 
 
         // Calendar panel
-        calendarPanel = new JPanel(new GridLayout(7, 7)); // 7x7: header + 6 weeks
-        add(calendarPanel, BorderLayout.CENTER);
+
         TaskCalendar tc = new TaskCalendar(currentYear, currentMonth); // example year/month
         JPanel calendarPanel = tc.getCalendarPanel();
 
         JFrame frame = new JFrame("Task Calendar");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(600, 400);
+        frame.setSize(1200, 800);
         frame.add(calendarPanel);
         frame.setVisible(true);
 

@@ -122,7 +122,7 @@ public class GUI extends JFrame {
 
     private void openMainMenu(int userID) {
         dispose();
-        System.out.println("Logged in " + userID);
+        System.out.println("Logged in user ID:" + userID);
 
         new MainMenu(userID);
     }
@@ -131,8 +131,10 @@ public class GUI extends JFrame {
 
 
 
-    // Entry point for testing
+    /* Entry point for testing
     public static void main(String[] args) {
         new GUI();
     }
+    */
+
 }

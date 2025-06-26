@@ -30,7 +30,6 @@ public class Database {
             writer.write(data);
             writer.newLine();
             writer.flush();
-            writer.close();
         } catch (IOException e) {
             System.out.println("Error writing to file");
         }

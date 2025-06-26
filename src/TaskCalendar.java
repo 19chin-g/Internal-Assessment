@@ -4,8 +4,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-import static javax.swing.SwingConstants.CENTER;
-
 public class TaskCalendar {
     int userID;
     int day;
@@ -39,11 +37,11 @@ public class TaskCalendar {
     public JPanel getCalendarPanel() {
         ArrayList<ArrayList<Integer>> calendar = createCalendar();
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(7, 8)); // 7 columns for Mon–Sun
+        panel.setLayout(new GridLayout(7, 7)); // 7 columns for Mon–Sun
 
         String[] days = { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
         for (String d : days) {
-            panel.add(new JLabel(d, CENTER));
+            panel.add(new JLabel(d, SwingConstants.CENTER));
         }
 
         for (ArrayList<Integer> week : calendar) {

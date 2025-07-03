@@ -24,6 +24,7 @@ public class TaskCalendar {
     String CYAN = "\033[0;36m";
     String LIGHT_GRAY = "\033[0;37m"; // Light Gray (Bright White)
     String BOLD = "\033[1m";
+    Color SoftBlue = new Color(194, 214, 246);
 
 
     public TaskCalendar(int year, int month) {
@@ -50,6 +51,9 @@ public class TaskCalendar {
                     panel.add(new JLabel(""));
                 } else {
                     JButton button = new JButton(day.toString());
+                    if (day == currentDay && currentMonth == month && currentYear == year) {
+                        button.setBackground(SoftBlue);
+                    }
                     button.addActionListener(e -> {
                         System.out.println("Clicked day: " + day);
                         // Optional: open task view or add popup

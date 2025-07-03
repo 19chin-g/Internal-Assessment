@@ -137,24 +137,30 @@ public class GUI extends JFrame {
         JButton logoutButton = new JButton("Log Out");
         logoutButton.setFont(new Font("Century Gothic", Font.BOLD, 12));
         logoutButton.setFocusable(false);
+        textPassword.setText("");
+        textUsername.setText("");
         logoutButton.addActionListener(e -> {
             cardLayout.show(getContentPane(), "login");
         });
 
+        // TOP PANEL
         JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.setBackground(new Color(200, 200, 200));
         topPanel.add(title, BorderLayout.CENTER);
         topPanel.add(logoutButton, BorderLayout.EAST);
 
+        // SIDE PANEL
         JPanel sidePanel = new JPanel();
         sidePanel.setLayout(new BoxLayout(sidePanel, BoxLayout.Y_AXIS));
         sidePanel.setBackground(new Color(230, 230, 250));
-        sidePanel.setPreferredSize(new Dimension(getWidth() / 5, getHeight()));
+        sidePanel.setPreferredSize(new Dimension(getWidth()/6, getHeight()));
 
         JButton tasksBtn = new JButton("My Tasks");
         JButton todayBtn = new JButton("Study Timer");
 
         for (JButton btn : new JButton[]{todayBtn, tasksBtn}) {
             btn.setAlignmentX(Component.CENTER_ALIGNMENT);
+            btn.setFocusable(false);
             btn.setMaximumSize(new Dimension(120, 30));
             sidePanel.add(Box.createRigidArea(new Dimension(0, 20)));
             sidePanel.add(btn);

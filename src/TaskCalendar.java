@@ -2,7 +2,6 @@ import java.time.*;
 import java.util.*;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 
 public class TaskCalendar {
     int userID;
@@ -54,9 +53,11 @@ public class TaskCalendar {
                     if (day == currentDay && currentMonth == month && currentYear == year) {
                         button.setBackground(SoftBlue);
                     }
+                    LocalDate selectedDate = LocalDate.of(year, month, day);
                     button.addActionListener(e -> {
                         System.out.println("Clicked day: " + day);
                         // Optional: open task view or add popup
+                        openTaskCreationDialog(selectedDate);
                     });
                     panel.add(button);
                 }
@@ -92,128 +93,84 @@ public class TaskCalendar {
         return calendar;
     }
 
-
-    /*
-    // Display the calendar with tasks highlighted
-    public void displayCalendar() {
-        ArrayList<ArrayList<Integer>> monthList = createCalendar();
-        LocalDate selectedMonth = LocalDate.of(year, month, 1);
-
-        System.out.println(BOLD + "============ CALENDAR ============" + RESET);
-
-        // Prints full date with day if on current month otherwise display month and year only
-        if (selectedMonth.getMonthValue() == currentMonth && year == currentYear) {
-            System.out.println(CYAN + day + " " + selectedMonth.getMonth() + " " + year + RESET);
+    public void openTaskCreationDialog(LocalDate date) {
+        String taskInfo = JOptionPane.showInputDialog(null,
+                "Add a task for " + date.toString() + ":",
+                "Create Task", JOptionPane.PLAIN_MESSAGE);
+        if (taskInfo != null && !taskInfo.trim().isEmpty()) {
+            System.out.println("Task for " + date + ": " + taskInfo);
+            // TODO: Save the task using your saveTask method or logic here
         } else {
-            System.out.println(CYAN + selectedMonth.getMonth() + " " + year + RESET);
-        }
-
-        System.out.println("Mon  Tue  Wed  Thu  Fri  Sat  Sun");
-
-        for (int week = 0; week < monthList.size(); week++) {
-            for (int day = 0; day < monthList.get(week).size(); day++) {
-                Integer currentDayInMonth = monthList.get(week).get(day);
-
-                if (currentDayInMonth == null) {
-                    System.out.print("     "); // Empty space for alignment
-                } else if (currentDayInMonth == currentDay && currentMonth == month && currentYear == year) {
-                    if (hasTask(userID, LocalDate.of(year, month, currentDayInMonth))) {
-                        System.out.printf("[%s%2d%s] ", DARK_RED, currentDayInMonth, RESET);
-                    } else {
-                        System.out.printf("[%s%2d%s] ", CYAN, currentDayInMonth, RESET);
-                    }
-                } else if (hasTask(userID, LocalDate.of(year, month, currentDayInMonth))) {
-                    if (currentDayInMonth < currentDay && currentMonth == month && currentYear == year) {
-                        // Tasks with passed due dates are red
-                        System.out.printf(" %s%2d%s  ", DARK_RED, currentDayInMonth, RESET);
-                    } else {
-                        // Future days with tasks are Green
-                        System.out.printf(" %s%2d%s  ", GREEN, currentDayInMonth, RESET);
-                    }
-                } else {
-                    // Normal days are light gray
-                    System.out.printf(" %s%2d%s  ", LIGHT_GRAY, currentDayInMonth, RESET);
-                }
-            }
-            System.out.println(); // Move to the next week row
+            System.out.println("No task entered.");
         }
     }
 
-    // check if a task exists on a specific date for the current use
-    public boolean hasTask(int userID, LocalDate date) {
-        ArrayList<String> records = taskFile.readAllRecords();
-        if (records != null) {
-            for (String record : records) {
-                String[] taskDetails = record.split(" ; "); // userID ; date ; type ; info
-                if (taskDetails.length >= 3 && taskDetails[0].equals(String.valueOf(userID)) && taskDetails[1].equals(date.toString())) {
-                    return true;  // task found for this exact user on the given date
-                }
+    private void openTaskCreation(LocalDate date) {
+        JDialog dialog = new JDialog();
+        dialog.setTitle("Create Task for " + date.toString());
+        dialog.setModal(true);
+        dialog.setSize(400, 300);
+        dialog.setLocationRelativeTo(null);
+        dialog.setLayout(new BorderLayout());
+
+        // Panel for inputs
+        JPanel inputPanel = new JPanel();
+        inputPanel.setLayout(new BoxLayout(inputPanel, BoxLayout.Y_AXIS));
+        inputPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JLabel dateLabel = new JLabel("Date: " + date.toString());
+        dateLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        inputPanel.add(dateLabel);
+
+        inputPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        JLabel typeLabel = new JLabel("Task Type:");
+        typeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        inputPanel.add(typeLabel);
+
+        String[] taskTypes = { "Academic", "Social & Personal", "Health & Wellbeing" };
+        JComboBox<String> typeComboBox = new JComboBox<>(taskTypes);
+        typeComboBox.setAlignmentX(Component.LEFT_ALIGNMENT);
+        inputPanel.add(typeComboBox);
+
+        inputPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        JLabel infoLabel = new JLabel("Task Info:");
+        infoLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        inputPanel.add(infoLabel);
+
+        JTextArea infoTextArea = new JTextArea(5, 30);
+        JScrollPane scrollPane = new JScrollPane(infoTextArea);
+        scrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
+        inputPanel.add(scrollPane);
+
+        dialog.add(inputPanel, BorderLayout.CENTER);
+
+        // Save button panel
+        JPanel buttonPanel = new JPanel();
+        JButton saveButton = new JButton("Save Task");
+        buttonPanel.add(saveButton);
+        dialog.add(buttonPanel, BorderLayout.SOUTH);
+
+        saveButton.addActionListener(e -> {
+            String taskType = (String) typeComboBox.getSelectedItem();
+            String taskInfo = infoTextArea.getText().trim();
+
+            if (taskInfo.isEmpty()) {
+                JOptionPane.showMessageDialog(dialog, "Task info cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
             }
-        }
-        return false;  // No task found for this user on this date
+
+            saveTask(userID, date, taskType, taskInfo);
+            JOptionPane.showMessageDialog(dialog, "Task saved successfully!");
+            dialog.dispose();
+        });
+
+        dialog.setVisible(true);
     }
 
-    public void removeTask() {
-        Scanner scanner = new Scanner(System.in);
-        LocalDate taskDate = null;
-        while (taskDate == null) {
-            System.out.print("Enter date (DD/MM/YY or D/M/YY) of completed task: ");
-            String input = scanner.nextLine().trim();
-            taskDate = stringToLocalDate(input);
-        }
 
-        if (hasTask(userID, taskDate)) {
-            ArrayList<String> records = taskFile.readAllRecords();
-            int recordNum = 0;
-            if (records != null) {
-                for (String record : records) {
 
-                    String[] taskDetails = record.split(" ; "); // userID ; date ; type ; info
-                    if (taskDetails.length >= 3 && taskDetails[0].equals(String.valueOf(userID)) && taskDetails[1].equals(taskDate.toString())) {
-                        taskFile.removeRecord(recordNum);
-                        System.out.println(GREEN + "Task removed successfully." + RESET);
-                    }
-                    recordNum++;
-
-                }
-            }
-        } else {
-            System.out.println(DARK_RED + "No tasks on specified date." + RESET);
-        }
-    }
-
-        public void viewTask() {
-            Scanner scanner = new Scanner(System.in);
-            LocalDate taskDate = null;
-            while (taskDate == null) {
-                System.out.print("Enter date (DD/MM/YY or D/M/YY) of task: ");
-                String input = scanner.nextLine().trim();
-                taskDate = stringToLocalDate(input);
-            }
-
-            if (hasTask(userID, taskDate)) {
-                ArrayList<String> records = taskFile.readAllRecords();
-                int recordNum = 0;
-                if (records != null) {
-                    for (String record : records) {
-                        recordNum++;
-                        String[] taskDetails = record.split(" ; "); // userID ; date ; type ; info
-                        if (taskDetails.length >= 3 && taskDetails[0].equals(String.valueOf(userID)) && taskDetails[1].equals(taskDate.toString())) {
-
-                            System.out.println(GREEN + "Task date: " + RESET + taskDetails[1]);
-                            System.out.println(GREEN + "Task type: " + RESET + taskDetails[2]);
-                            System.out.println(GREEN + "Task info: " + RESET + taskDetails[3]);
-
-                        }
-
-                    }
-                }
-            } else {
-                System.out.println("No tasks on specified date.");
-            }
-        }
-
-    */
     public void viewTask() {
         ArrayList<String> records = taskFile.readAllRecords();
         ArrayList<String> tasks = new ArrayList<>();

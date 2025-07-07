@@ -1,4 +1,5 @@
 import java.time.*;
+import java.time.format.TextStyle;
 import java.util.*;
 import javax.swing.*;
 import java.awt.*;
@@ -26,47 +27,13 @@ public class TaskCalendar {
     Color SoftBlue = new Color(194, 214, 246);
 
 
-    public TaskCalendar(int year, int month) {
+    public TaskCalendar(int userID, int day, int month, int year, String filename) {
         this.userID = userID;
         this.day = day;
         this.month = month;
         this.year = year;
-        //this.taskFile = new Database(filename);
+        this.taskFile = new Database(filename);
     }
-
-    public JPanel getCalendarPanel() {
-        ArrayList<ArrayList<Integer>> calendar = createCalendar();
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(7, 7)); // 7 columns for Mon–Sun
-
-        String[] days = { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
-        for (String d : days) {
-            panel.add(new JLabel(d, SwingConstants.CENTER));
-        }
-
-        for (ArrayList<Integer> week : calendar) {
-            for (Integer day : week) {
-                if (day == null) {
-                    panel.add(new JLabel(""));
-                } else {
-                    JButton button = new JButton(day.toString());
-                    if (day == currentDay && currentMonth == month && currentYear == year) {
-                        button.setBackground(SoftBlue);
-                    }
-                    LocalDate selectedDate = LocalDate.of(year, month, day);
-                    button.addActionListener(e -> {
-                        System.out.println("Clicked day: " + day);
-                        // Optional: open task view or add popup
-                        openTaskCreationDialog(selectedDate);
-                    });
-                    panel.add(button);
-                }
-            }
-        }
-
-        return panel;
-    }
-
 
     public ArrayList<ArrayList<Integer>> createCalendar() {
         ArrayList<ArrayList<Integer>> calendar = new ArrayList<>();
@@ -93,21 +60,73 @@ public class TaskCalendar {
         return calendar;
     }
 
-    public void openTaskCreationDialog(LocalDate date) {
-        String taskInfo = JOptionPane.showInputDialog(null,
-                "Add a task for " + date.toString() + ":",
-                "Create Task", JOptionPane.PLAIN_MESSAGE);
-        if (taskInfo != null && !taskInfo.trim().isEmpty()) {
-            System.out.println("Task for " + date + ": " + taskInfo);
-            // TODO: Save the task using your saveTask method or logic here
-        } else {
-            System.out.println("No task entered.");
+    public JPanel getCalendarPanel() {
+        ArrayList<ArrayList<Integer>> calendar = createCalendar();
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(7, 7)); // 7 columns for Mon–Sun
+
+        String[] days = { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
+        for (String d : days) {
+            panel.add(new JLabel(d, SwingConstants.CENTER));
         }
+
+        for (ArrayList<Integer> week : calendar) {
+            for (Integer day : week) {
+                if (day == null) {
+                    panel.add(new JLabel(""));
+                } else {
+                    JButton button = getButton(day);
+                    panel.add(button);
+                }
+            }
+        }
+
+        return panel;
     }
+
+    private JButton getButton(Integer day) {
+        JButton button = new JButton(day.toString());
+        button.setFocusable(false);
+        if (day == currentDay && currentMonth == month && currentYear == year) {
+            button.setBackground(SoftBlue);
+        } else if (today == LocalDate.of(day, cu)) {
+
+        }
+        LocalDate selectedDate = LocalDate.of(year, month, day);
+        button.addActionListener(e -> {
+            System.out.println("Clicked day: " + day);
+            openTaskCreation(selectedDate);
+        });
+        return button;
+    }
+
+
+
+    private String formatDate(LocalDate date) {
+        int day = date.getDayOfMonth();
+        String suffix;
+
+        if (day >= 11 && day <= 13) {
+            suffix = "th";
+        } else {
+            switch (day % 10) {
+                case 1 -> suffix = "st";
+                case 2 -> suffix = "nd";
+                case 3 -> suffix = "rd";
+                default -> suffix = "th";
+            }
+        }
+
+        String month = date.getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH); // e.g., "July"
+        int year = date.getYear();
+
+        return day + suffix + " " + month + " " + year;
+    }
+
 
     private void openTaskCreation(LocalDate date) {
         JDialog dialog = new JDialog();
-        dialog.setTitle("Create Task for " + date.toString());
+        dialog.setTitle("Create Task for " + formatDate(date));
         dialog.setModal(true);
         dialog.setSize(400, 300);
         dialog.setLocationRelativeTo(null);
@@ -118,7 +137,7 @@ public class TaskCalendar {
         inputPanel.setLayout(new BoxLayout(inputPanel, BoxLayout.Y_AXIS));
         inputPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        JLabel dateLabel = new JLabel("Date: " + date.toString());
+        JLabel dateLabel = new JLabel("Date: " + formatDate(date));
         dateLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         inputPanel.add(dateLabel);
 
@@ -146,7 +165,7 @@ public class TaskCalendar {
 
         dialog.add(inputPanel, BorderLayout.CENTER);
 
-        // Save button panel
+        // SAVE TASK BUTTON
         JPanel buttonPanel = new JPanel();
         JButton saveButton = new JButton("Save Task");
         buttonPanel.add(saveButton);
@@ -194,90 +213,7 @@ public class TaskCalendar {
 
 
 
-    public LocalDate stringToLocalDate(String date) {
-        try {
-            String[] dateParts = date.split("/");
 
-            int inputDay = Integer.parseInt(dateParts[0]);
-            int inputMonth = Integer.parseInt(dateParts[1]);
-            int inputYear = Integer.parseInt(dateParts[2]);
-
-            // Optional: reject if parts are too long (e.g. "123/45/67")
-            if (dateParts[0].length() > 2 || dateParts[1].length() > 2 || dateParts[2].length() > 2) {
-                System.out.println(DARK_RED + "1Invalid format! Use DD/MM/YY format. " + RESET);
-                return null;
-            }
-
-            if (inputMonth < 1 || inputMonth > 12) {
-                System.out.println(DARK_RED + "Invalid month! Use DD/MM/YY format. " + RESET);
-                return null;
-            }
-
-            if (inputYear < 0 || inputYear > 99) {
-                System.out.println(DARK_RED + "Invalid year! Use DD/MM/YY format. " + RESET);
-                return null;
-            }
-
-            inputYear += 2000;
-            int daysInMonth = YearMonth.of(inputYear, inputMonth).lengthOfMonth();
-
-            if (inputDay < 1 || inputDay > daysInMonth) {
-                System.out.println(DARK_RED + "Invalid day for given month/year. " + RESET);
-                return null;
-            }
-
-            return LocalDate.of(inputYear, inputMonth, inputDay);
-
-        } catch (Exception e) {
-            System.out.println(DARK_RED + "Invalid input! Use DD/MM/YY format with numbers. " + RESET);
-            return null;
-        }
-    }
-
-
-
-    // Add a task to a specific date
-    public void addTask() {
-        Scanner scanner = new Scanner(System.in);
-        LocalDate taskDate = null;
-        String taskType = "";
-        String taskInfo = "";
-
-        System.out.println(BOLD + YELLOW + "======== TASK CREATION ========" + RESET);
-        while (taskDate == null) {
-            System.out.print("Enter date (DD/MM/YY or D/M/YY) to add task: ");
-            String input = scanner.nextLine().trim();
-            taskDate = stringToLocalDate(input);
-        }
-
-
-
-        // prompt for task type and information
-        System.out.println("1) Academic");
-        System.out.println("2) Social & Personal");
-        System.out.println("3) Health & Wellbeing");
-
-        while (taskType.isEmpty()) {
-            System.out.print("Enter task type: ");
-            switch (scanner.nextLine().trim()) {
-                case "1" -> taskType = "Academic";
-                case "2" -> taskType = "Social & Personal";
-                case "3" -> taskType = "Health & Wellbeing";
-                default -> System.out.println(DARK_RED + "Invalid choice!" + RESET);
-            }
-        }
-
-        // Task description
-        System.out.println("Enter task info: ");
-        while (taskInfo.trim().isEmpty()) {
-            taskInfo = scanner.nextLine().trim();
-            if (taskInfo.isEmpty()) {
-                System.out.print(DARK_RED + "Task info cannot be empty. Please enter some information: " + RESET);
-            }
-        }
-
-        saveTask(userID, taskDate, taskType, taskInfo);
-    }
 
     // Save the task to the file
     public void saveTask(int userID, LocalDate taskDate, String type, String info) {

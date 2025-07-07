@@ -5,9 +5,8 @@ import java.time.LocalDate;
 public class GUI extends JFrame {
     private JTextField textUsername;
     private JPasswordField textPassword;
-    private JButton loginButton, signupButton;
     private JPanel loginPanel;
-    private CardLayout cardLayout;
+    private final CardLayout cardLayout;
     private final Login login;
 
     public GUI() {
@@ -21,13 +20,13 @@ public class GUI extends JFrame {
         cardLayout = new CardLayout();
         setLayout(cardLayout);
 
-        initLoginPanel();
+        LoginPanel();
         add(loginPanel, "login");
 
         setVisible(true);
     }
 
-    private void initLoginPanel() {
+    private void LoginPanel() {
         loginPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
@@ -79,8 +78,9 @@ public class GUI extends JFrame {
         loginPanel.add(showPassword, gbc);
 
         // LOGIN BUTTON
-        loginButton = new JButton("Log in");
-        signupButton = new JButton("Sign up");
+        JButton loginButton = new JButton("Log in");
+        // SIGN UP BUTTON
+        JButton signupButton = new JButton("Sign up");
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
         buttonPanel.add(loginButton);
@@ -124,10 +124,11 @@ public class GUI extends JFrame {
 
     private void openMainMenu(int userID) {
         LocalDate currentDate = LocalDate.now();
+        int currentDay = currentDate.getDayOfMonth();
         int currentMonth = currentDate.getMonthValue();
         int currentYear = currentDate.getYear();
 
-        TaskCalendar tc = new TaskCalendar(currentYear, currentMonth);
+        TaskCalendar tc = new TaskCalendar(userID, currentDay, currentMonth, currentYear, "tasks.txt");
         JPanel calendarPanel = tc.getCalendarPanel();
 
         JLabel title = new JLabel(currentDate.getMonth() + " " + currentYear);

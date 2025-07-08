@@ -1,7 +1,11 @@
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.time.*;
 import java.time.format.TextStyle;
 import java.util.*;
 import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 
 public class TaskCalendar {
@@ -24,7 +28,8 @@ public class TaskCalendar {
     String CYAN = "\033[0;36m";
     String LIGHT_GRAY = "\033[0;37m"; // Light Gray (Bright White)
     String BOLD = "\033[1m";
-    Color SoftBlue = new Color(194, 214, 246);
+
+
 
 
     public TaskCalendar(int userID, int day, int month, int year, String filename) {
@@ -84,12 +89,70 @@ public class TaskCalendar {
         return panel;
     }
 
+    private boolean hasTask(LocalDate taskDate) {
+        ArrayList<String> records = taskFile.readAllRecords();
+        if (records != null) {
+            for (String record : records) {
+                String[] taskDetails = record.split(" ; "); // userID ; date ; type ; info
+                if (taskDetails[0].equals(String.valueOf(userID)) && taskDetails[1].equals(taskDate.toString())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     private JButton getButton(Integer day) {
+        // Define your default day button color
+        Color defaultDayColor = new Color(224, 230, 255); // Light grey default
+        Color currentDayColor = new Color(185, 207, 248); // Soft blue for today
+        Color taskDayColor = new Color(180, 240, 200);    // Soft green for task days
+
+         // Create button for the day
         JButton button = new JButton(day.toString());
+
+        button.setHorizontalAlignment(SwingConstants.LEFT);   // Top-left alignment
+        button.setVerticalAlignment(SwingConstants.TOP);
+
+        button.setOpaque(true);
+        button.setContentAreaFilled(true);
+        button.setBorder(BorderFactory.createEmptyBorder());
+        button.setBackground(defaultDayColor); // Default color
         button.setFocusable(false);
+
+       // Example condition: current day
         if (day == currentDay && currentMonth == month && currentYear == year) {
-            button.setBackground(SoftBlue);
-        } else if (today == LocalDate.of(day, cu)) {
+            button.setBackground(currentDayColor);
+        }
+
+        // Store original background
+        Color originalColor = button.getBackground();
+        Color hoverColor = originalColor.darker(); // Darker tint for hover
+        Border hoverBorder = BorderFactory.createLineBorder(Color.DARK_GRAY, 2);
+        Border defaultBorder = BorderFactory.createEmptyBorder();
+
+        // Add hover effect (color + border)
+        button.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                button.setBackground(hoverColor);
+                button.setBorder(hoverBorder);
+                button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                button.setBackground(originalColor);
+                button.setBorder(defaultBorder);
+            }
+        });
+
+
+        if (day == currentDay && currentMonth == month && currentYear == year) {
+            button.setBackground(currentDayColor);
+        }
+         else if (hasTask(LocalDate.of(currentYear, currentMonth, day))) {
+            button.setBackground(taskDayColor);
 
         }
         LocalDate selectedDate = LocalDate.of(year, month, day);
@@ -117,9 +180,8 @@ public class TaskCalendar {
             }
         }
 
-        String month = date.getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH); // e.g., "July"
+        String month = date.getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
         int year = date.getYear();
-
         return day + suffix + " " + month + " " + year;
     }
 

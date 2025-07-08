@@ -9,6 +9,8 @@ public class GUI extends JFrame {
     private final CardLayout cardLayout;
     private final Login login;
 
+    Color backgroundColor = new Color(250, 250, 250); // Very light gray, almost white
+
     public GUI() {
         login = new Login("users.txt");
 
@@ -138,8 +140,8 @@ public class GUI extends JFrame {
         JButton logoutButton = new JButton("Log Out");
         logoutButton.setFont(new Font("Century Gothic", Font.BOLD, 12));
         logoutButton.setFocusable(false);
-        textPassword.setText("");
-        textUsername.setText("");
+        textPassword.setText(""); // Clears password field when returning to login screen
+        textUsername.setText(""); // Clears username field when returning to login screen
         logoutButton.addActionListener(e -> {
             cardLayout.show(getContentPane(), "login");
         });
@@ -168,6 +170,7 @@ public class GUI extends JFrame {
         }
 
         JPanel mainContent = new JPanel(new BorderLayout());
+        mainContent.setBackground(backgroundColor);
         mainContent.add(topPanel, BorderLayout.NORTH);
         mainContent.add(calendarPanel, BorderLayout.CENTER);
         mainContent.add(sidePanel, BorderLayout.WEST);

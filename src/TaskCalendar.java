@@ -69,6 +69,7 @@ public class TaskCalendar {
         ArrayList<ArrayList<Integer>> calendar = createCalendar();
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(7, 7)); // 7 columns for Mon–Sun
+        panel.setBackground(Color.white);
 
         String[] days = { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
         for (String d : days) {
@@ -123,6 +124,11 @@ public class TaskCalendar {
        // Example condition: current day
         if (day == currentDay && currentMonth == month && currentYear == year) {
             button.setBackground(currentDayColor);
+
+        } else if (hasTask(LocalDate.of(currentYear, currentMonth, day))) {
+            button.setBackground(taskDayColor);
+
+
         }
 
         // Store original background
@@ -148,13 +154,6 @@ public class TaskCalendar {
         });
 
 
-        if (day == currentDay && currentMonth == month && currentYear == year) {
-            button.setBackground(currentDayColor);
-        }
-         else if (hasTask(LocalDate.of(currentYear, currentMonth, day))) {
-            button.setBackground(taskDayColor);
-
-        }
         LocalDate selectedDate = LocalDate.of(year, month, day);
         button.addActionListener(e -> {
             System.out.println("Clicked day: " + day);

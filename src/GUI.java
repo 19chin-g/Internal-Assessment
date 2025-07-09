@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.time.LocalDate;
 
@@ -9,7 +10,8 @@ public class GUI extends JFrame {
     private final CardLayout cardLayout;
     private final Login login;
 
-    Color backgroundColor = new Color(250, 250, 250); // Very light gray, almost white
+    Color backgroundColor = new Color(255, 255, 255); // Very light gray, almost white
+
 
     public GUI() {
         login = new Login("users.txt");
@@ -30,6 +32,7 @@ public class GUI extends JFrame {
 
     private void LoginPanel() {
         loginPanel = new JPanel(new GridBagLayout());
+        loginPanel.setBackground(Color.white);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
         int fontSize = 14;
@@ -132,30 +135,26 @@ public class GUI extends JFrame {
 
         TaskCalendar tc = new TaskCalendar(userID, currentDay, currentMonth, currentYear, "tasks.txt");
         JPanel calendarPanel = tc.getCalendarPanel();
+        //calendarPanel.setBackground();
 
         JLabel title = new JLabel(currentDate.getMonth() + " " + currentYear);
         title.setFont(new Font("Century Gothic", Font.BOLD, 20));
         title.setHorizontalAlignment(SwingConstants.CENTER);
 
-        JButton logoutButton = new JButton("Log Out");
-        logoutButton.setFont(new Font("Century Gothic", Font.BOLD, 12));
-        logoutButton.setFocusable(false);
-        textPassword.setText(""); // Clears password field when returning to login screen
-        textUsername.setText(""); // Clears username field when returning to login screen
-        logoutButton.addActionListener(e -> {
-            cardLayout.show(getContentPane(), "login");
-        });
+        JButton logoutButton = getjButton();
+
 
         // TOP PANEL
         JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.setBackground(new Color(200, 200, 200));
+        topPanel.setBackground(new Color(255, 255, 255));
+        topPanel.setBorder(new LineBorder(Color.DARK_GRAY, 2));
         topPanel.add(title, BorderLayout.CENTER);
         topPanel.add(logoutButton, BorderLayout.EAST);
 
         // SIDE PANEL
         JPanel sidePanel = new JPanel();
         sidePanel.setLayout(new BoxLayout(sidePanel, BoxLayout.Y_AXIS));
-        sidePanel.setBackground(new Color(230, 230, 250));
+        sidePanel.setBackground(new Color(157, 157, 255));
         sidePanel.setPreferredSize(new Dimension(getWidth()/6, getHeight()));
 
         JButton tasksBtn = new JButton("My Tasks");
@@ -177,5 +176,38 @@ public class GUI extends JFrame {
 
         add(mainContent, "main");
         cardLayout.show(getContentPane(), "main");
+    }
+
+    private JButton getjButton() {
+        JButton logoutButton = new JButton("Log Out");
+        logoutButton.setFont(new Font("Century Gothic", Font.BOLD, 12));
+        logoutButton.setFocusable(false);
+        logoutButton.setBackground(new Color(220, 53, 69)); // Soft red (like Bootstrap's danger)
+        logoutButton.setForeground(Color.WHITE);            // White text
+        logoutButton.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(200, 0, 0), 1), // Thin red border
+                BorderFactory.createEmptyBorder(5, 15, 5, 15)            // Padding inside
+        ));
+        logoutButton.setCursor(new Cursor(Cursor.HAND_CURSOR));      // Hand cursor on hover
+
+        logoutButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                logoutButton.setBackground(new Color(200, 40, 55)); // Darker red on hover
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                logoutButton.setBackground(new Color(220, 53, 69)); // Original red
+            }
+        });
+
+        // Clear username and password fields, return to login screen
+        logoutButton.addActionListener(e -> {
+            textPassword.setText("");
+            textUsername.setText("");
+            cardLayout.show(getContentPane(), "login");
+        });
+        return logoutButton;
     }
 }

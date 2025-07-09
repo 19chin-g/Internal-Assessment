@@ -103,6 +103,24 @@ public class TaskCalendar {
         return false;
     }
 
+    private ArrayList<String[]> getTasksOnDate(LocalDate taskDate) {
+        ArrayList<String[]> tasks = new ArrayList<>();
+        ArrayList<String> records = taskFile.readAllRecords();
+
+        if (records != null) {
+            for (String record : records) {
+                String[] taskDetails = record.split(" ; "); // userID ; date ; type ; info
+                if (taskDetails.length >= 4 &&
+                        taskDetails[0].equals(String.valueOf(userID)) &&
+                        taskDetails[1].equals(taskDate.toString())) {
+                    tasks.add(taskDetails); // Add entire task entry
+                }
+            }
+        }
+        return tasks; // May be empty if no tasks found
+    }
+
+
     private JButton getButton(Integer day) {
         // Define your default day button color
         Color defaultDayColor = new Color(224, 230, 255); // Light grey default
@@ -120,6 +138,8 @@ public class TaskCalendar {
         button.setBorder(BorderFactory.createEmptyBorder());
         button.setBackground(defaultDayColor); // Default color
         button.setFocusable(false);
+
+        getTasksOnDate(LocalDate.of(currentYear, currentMonth, day));
 
        // Example condition: current day
         if (day == currentDay && currentMonth == month && currentYear == year) {

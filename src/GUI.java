@@ -1,6 +1,8 @@
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.time.LocalDate;
 
 public class GUI extends JFrame {
@@ -32,7 +34,7 @@ public class GUI extends JFrame {
 
     private void LoginPanel() {
         loginPanel = new JPanel(new GridBagLayout());
-        loginPanel.setBackground(Color.white);
+        loginPanel.setBackground(Color.getHSBColor(50,60,30));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
         int fontSize = 14;
@@ -135,7 +137,6 @@ public class GUI extends JFrame {
 
         TaskCalendar tc = new TaskCalendar(userID, currentDay, currentMonth, currentYear, "tasks.txt");
         JPanel calendarPanel = tc.getCalendarPanel();
-        //calendarPanel.setBackground();
 
         JLabel title = new JLabel(currentDate.getMonth() + " " + currentYear);
         title.setFont(new Font("Century Gothic", Font.BOLD, 20));
@@ -143,10 +144,9 @@ public class GUI extends JFrame {
 
         JButton logoutButton = getjButton();
 
-
         // TOP PANEL
         JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.setBackground(new Color(255, 255, 255));
+        topPanel.setBackground(Color.WHITE);
         topPanel.setBorder(new LineBorder(Color.DARK_GRAY, 2));
         topPanel.add(title, BorderLayout.CENTER);
         topPanel.add(logoutButton, BorderLayout.EAST);
@@ -155,28 +155,47 @@ public class GUI extends JFrame {
         JPanel sidePanel = new JPanel();
         sidePanel.setLayout(new BoxLayout(sidePanel, BoxLayout.Y_AXIS));
         sidePanel.setBackground(new Color(157, 157, 255));
-        sidePanel.setPreferredSize(new Dimension(getWidth()/6, getHeight()));
+        sidePanel.setMinimumSize(new Dimension(150, 0));
+        sidePanel.setPreferredSize(new Dimension(getWidth() / 7, 5));
 
-        JButton tasksBtn = new JButton("My Tasks");
-        JButton todayBtn = new JButton("Study Timer");
+// TIMER BUTTON
+        JButton timerBtn = new JButton("My Tasks");
+        timerBtn.setFocusable(false);
+        timerBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        timerBtn.setBackground(Color.lightGray);
 
-        for (JButton btn : new JButton[]{todayBtn, tasksBtn}) {
-            btn.setAlignmentX(Component.CENTER_ALIGNMENT);
-            btn.setFocusable(false);
-            btn.setMaximumSize(new Dimension(120, 30));
-            sidePanel.add(Box.createRigidArea(new Dimension(0, 20)));
-            sidePanel.add(btn);
-        }
+// Wrap button in panel with padding
+        JPanel timerWrapper = new JPanel();
+        timerWrapper.setLayout(new BorderLayout());
+        timerWrapper.setBackground(new Color(157, 157, 255));
+        timerWrapper.setBorder(BorderFactory.createEmptyBorder(10, 10, getHeight() - 30, 10)); // Top, Left, Bottom, Right
+        timerWrapper.add(timerBtn, BorderLayout.CENTER);
 
+        sidePanel.add(timerWrapper);
+        sidePanel.add(Box.createVerticalStrut(15)); // Space before next component if needed
+
+// MAIN CONTENT PANEL
         JPanel mainContent = new JPanel(new BorderLayout());
         mainContent.setBackground(backgroundColor);
         mainContent.add(topPanel, BorderLayout.NORTH);
         mainContent.add(calendarPanel, BorderLayout.CENTER);
         mainContent.add(sidePanel, BorderLayout.WEST);
 
+// Resize behavior
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                int newWidth = getWidth() / 7;
+                sidePanel.setPreferredSize(new Dimension(newWidth, getHeight()));
+                sidePanel.revalidate();
+            }
+        });
+
+
         add(mainContent, "main");
         cardLayout.show(getContentPane(), "main");
     }
+
 
     private JButton getjButton() {
         JButton logoutButton = new JButton("Log Out");

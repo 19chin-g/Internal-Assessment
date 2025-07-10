@@ -13,6 +13,10 @@ public class GUI extends JFrame {
     private final Login login;
 
     Color backgroundColor = new Color(255, 255, 255); // Very light gray, almost white
+    Color sidePanelColor = new Color(233, 233, 233); // Very light gray, almost white
+
+    private final int SIDE_PANEL_FRACTION = 5;
+
 
 
     public GUI() {
@@ -34,7 +38,7 @@ public class GUI extends JFrame {
 
     private void LoginPanel() {
         loginPanel = new JPanel(new GridBagLayout());
-        loginPanel.setBackground(Color.getHSBColor(50,60,30));
+        loginPanel.setBackground(backgroundColor);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
         int fontSize = 14;
@@ -75,6 +79,7 @@ public class GUI extends JFrame {
         JCheckBox showPassword = new JCheckBox("Show Password");
         showPassword.setFont(new Font("Arial", Font.BOLD, fontSize));
         showPassword.setFocusable(false);
+        showPassword.setBackground(backgroundColor);
         showPassword.addActionListener(e -> {
             textPassword.setEchoChar(showPassword.isSelected() ? (char) 0 : defaultEchoChar);
         });
@@ -90,6 +95,7 @@ public class GUI extends JFrame {
         JButton signupButton = new JButton("Sign up");
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
+        buttonPanel.setBackground(backgroundColor);
         buttonPanel.add(loginButton);
         buttonPanel.add(signupButton);
 
@@ -154,38 +160,41 @@ public class GUI extends JFrame {
         // SIDE PANEL
         JPanel sidePanel = new JPanel();
         sidePanel.setLayout(new BoxLayout(sidePanel, BoxLayout.Y_AXIS));
-        sidePanel.setBackground(new Color(157, 157, 255));
+        sidePanel.setBackground(sidePanelColor);
         sidePanel.setMinimumSize(new Dimension(150, 0));
-        sidePanel.setPreferredSize(new Dimension(getWidth() / 7, 5));
+        sidePanel.setPreferredSize(new Dimension(getWidth() / SIDE_PANEL_FRACTION, 5));
 
-// TIMER BUTTON
-        JButton timerBtn = new JButton("My Tasks");
+        // TIMER BUTTON
+        JButton timerBtn = new JButton("Study timer");
         timerBtn.setFocusable(false);
         timerBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
         timerBtn.setBackground(Color.lightGray);
+        timerBtn.setMaximumSize(new Dimension(Integer.MAX_VALUE, timerBtn.getPreferredSize().height));
 
-// Wrap button in panel with padding
+        // Wrap button in panel with padding
         JPanel timerWrapper = new JPanel();
         timerWrapper.setLayout(new BorderLayout());
-        timerWrapper.setBackground(new Color(157, 157, 255));
-        timerWrapper.setBorder(BorderFactory.createEmptyBorder(10, 10, getHeight() - 30, 10)); // Top, Left, Bottom, Right
+        timerWrapper.setBackground(sidePanelColor);
+        timerWrapper.setBorder(BorderFactory.createEmptyBorder(10, 10, 30, 10));
         timerWrapper.add(timerBtn, BorderLayout.CENTER);
+        timerWrapper.setMaximumSize(new Dimension(Integer.MAX_VALUE, timerWrapper.getPreferredSize().height));
 
         sidePanel.add(timerWrapper);
-        sidePanel.add(Box.createVerticalStrut(15)); // Space before next component if needed
+        sidePanel.add(Box.createVerticalStrut(15));
 
-// MAIN CONTENT PANEL
+
+        // MAIN CONTENT PANEL
         JPanel mainContent = new JPanel(new BorderLayout());
         mainContent.setBackground(backgroundColor);
         mainContent.add(topPanel, BorderLayout.NORTH);
         mainContent.add(calendarPanel, BorderLayout.CENTER);
         mainContent.add(sidePanel, BorderLayout.WEST);
 
-// Resize behavior
+        // Resize behavior
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
-                int newWidth = getWidth() / 7;
+                int newWidth = getWidth() / SIDE_PANEL_FRACTION;
                 sidePanel.setPreferredSize(new Dimension(newWidth, getHeight()));
                 sidePanel.revalidate();
             }

@@ -124,7 +124,7 @@ public class TaskCalendar {
     private JButton getButton(Integer day) {
         // Define your default day button color
         Color defaultDayColor = new Color(224, 230, 255); // Light grey default
-        Color currentDayColor = new Color(185, 207, 248); // Soft blue for today
+        Color currentDayColor = new Color(171, 197, 255); // Soft blue for today
         Color taskDayColor = new Color(180, 240, 200);    // Soft green for task days
 
          // Create button for the day
@@ -144,11 +144,12 @@ public class TaskCalendar {
        // Example condition: current day
         if (day == currentDay && currentMonth == month && currentYear == year) {
             button.setBackground(currentDayColor);
+            Border defaultBorder = BorderFactory.createLineBorder(Color.DARK_GRAY, 2);
 
         } else if (hasTask(LocalDate.of(currentYear, currentMonth, day))) {
             button.setBackground(taskDayColor);
-
-
+        } else {
+            Border defaultBorder = BorderFactory.createEmptyBorder();
         }
 
         // Store original background

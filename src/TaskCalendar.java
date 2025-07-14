@@ -5,7 +5,6 @@ import java.time.format.TextStyle;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.border.LineBorder;
 import java.awt.*;
 
 public class TaskCalendar {
@@ -39,6 +38,8 @@ public class TaskCalendar {
         this.year = year;
         this.taskFile = new Database(filename);
     }
+
+
 
     public ArrayList<ArrayList<Integer>> createCalendar() {
         ArrayList<ArrayList<Integer>> calendar = new ArrayList<>();
@@ -110,8 +111,7 @@ public class TaskCalendar {
         if (records != null) {
             for (String record : records) {
                 String[] taskDetails = record.split(" ; "); // userID ; date ; type ; info
-                if (taskDetails.length >= 4 &&
-                        taskDetails[0].equals(String.valueOf(userID)) &&
+                if (taskDetails[0].equals(String.valueOf(userID)) &&
                         taskDetails[1].equals(taskDate.toString())) {
                     tasks.add(taskDetails); // Add entire task entry
                 }
@@ -132,33 +132,31 @@ public class TaskCalendar {
 
         button.setHorizontalAlignment(SwingConstants.LEFT);   // Top-left alignment
         button.setVerticalAlignment(SwingConstants.TOP);
-
-        button.setOpaque(true);
-        button.setContentAreaFilled(true);
-        button.setBorder(BorderFactory.createEmptyBorder());
-        button.setBackground(defaultDayColor); // Default color
         button.setFocusable(false);
 
         getTasksOnDate(LocalDate.of(currentYear, currentMonth, day));
 
-       // Example condition: current day
+        Border hoverBorder = BorderFactory.createLineBorder(Color.DARK_GRAY, 2);
+        Border defaultBorder = null;
+
         if (day == currentDay && currentMonth == month && currentYear == year) {
             button.setBackground(currentDayColor);
-            Border defaultBorder = BorderFactory.createLineBorder(Color.DARK_GRAY, 2);
-
+            defaultBorder = hoverBorder;
         } else if (hasTask(LocalDate.of(currentYear, currentMonth, day))) {
             button.setBackground(taskDayColor);
+            defaultBorder = BorderFactory.createEmptyBorder();
         } else {
-            Border defaultBorder = BorderFactory.createEmptyBorder();
+            defaultBorder = BorderFactory.createEmptyBorder();
+            button.setBackground(defaultDayColor);
         }
 
-        // Store original background
         Color originalColor = button.getBackground();
         Color hoverColor = originalColor.darker(); // Darker tint for hover
-        Border hoverBorder = BorderFactory.createLineBorder(Color.DARK_GRAY, 2);
-        Border defaultBorder = BorderFactory.createEmptyBorder();
+        button.setBorder(defaultBorder);
+        button.setBackground(originalColor);
 
         // Add hover effect (color + border)
+        Border finalDefaultBorder = defaultBorder;
         button.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
@@ -170,7 +168,7 @@ public class TaskCalendar {
             @Override
             public void mouseExited(MouseEvent e) {
                 button.setBackground(originalColor);
-                button.setBorder(defaultBorder);
+                button.setBorder(finalDefaultBorder);
             }
         });
 
@@ -206,6 +204,7 @@ public class TaskCalendar {
     }
 
 
+
     private void openTaskCreation(LocalDate date) {
         JDialog dialog = new JDialog();
         dialog.setTitle("Create Task for " + formatDate(date));
@@ -235,6 +234,13 @@ public class TaskCalendar {
         inputPanel.add(typeComboBox);
 
         inputPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        ArrayList<String[]> loggedTasks = getTasksOnDate(date);
+        System.out.println(Arrays.toString(loggedTasks.get(0)));
+        JLabel loggedTasksLabel = new JLabel("Tasks");
+        System.out.println(getTasksOnDate(date).toString());
+        loggedTasksLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        inputPanel.add(loggedTasksLabel);
 
         JLabel infoLabel = new JLabel("Task Info:");
         infoLabel.setAlignmentX(Component.LEFT_ALIGNMENT);

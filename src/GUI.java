@@ -12,8 +12,10 @@ public class GUI extends JFrame {
     private final CardLayout cardLayout;
     private final Login login;
 
-    Color backgroundColor = new Color(255, 255, 255); // Very light gray, almost white
-    Color sidePanelColor = new Color(233, 233, 233); // Very light gray, almost white
+    Color backgroundColor = new Color(255, 255, 255);
+    Color sidePanelColor = new Color(190, 190, 190);
+    Color topPanelColor = new Color(226, 226, 226);
+
 
     private final int SIDE_PANEL_FRACTION = 5;
 
@@ -145,7 +147,7 @@ public class GUI extends JFrame {
         JPanel calendarPanel = tc.getCalendarPanel();
 
         JLabel title = new JLabel(currentDate.getMonth() + " " + currentYear);
-        title.setFont(new Font("Century Gothic", Font.BOLD, 20));
+        title.setFont(new Font("Century Gothic", Font.BOLD, 24));
         title.setHorizontalAlignment(SwingConstants.CENTER);
 
         JButton logoutButton = getjButton();
@@ -153,7 +155,7 @@ public class GUI extends JFrame {
         // TOP PANEL
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setBackground(Color.WHITE);
-        topPanel.setBorder(new LineBorder(Color.DARK_GRAY, 2));
+        topPanel.setBackground(topPanelColor);
         topPanel.add(title, BorderLayout.CENTER);
         topPanel.add(logoutButton, BorderLayout.EAST);
 
@@ -161,8 +163,8 @@ public class GUI extends JFrame {
         JPanel sidePanel = new JPanel();
         sidePanel.setLayout(new BoxLayout(sidePanel, BoxLayout.Y_AXIS));
         sidePanel.setBackground(sidePanelColor);
-        sidePanel.setMinimumSize(new Dimension(150, 0));
-        sidePanel.setPreferredSize(new Dimension(getWidth() / SIDE_PANEL_FRACTION, 5));
+        //sidePanel.setMinimumSize(new Dimension(150, 0));
+        //sidePanel.setPreferredSize(new Dimension(getWidth() / SIDE_PANEL_FRACTION, 1));
 
         // TIMER BUTTON
         JButton timerBtn = new JButton("Study timer");

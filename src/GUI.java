@@ -1,9 +1,10 @@
 import javax.swing.*;
-import javax.swing.border.LineBorder;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 public class GUI extends JFrame {
     private JTextField textUsername;
@@ -12,14 +13,21 @@ public class GUI extends JFrame {
     private final CardLayout cardLayout;
     private final Login login;
 
-    Color backgroundColor = new Color(255, 255, 255);
-    Color sidePanelColor = new Color(190, 190, 190);
-    Color topPanelColor = new Color(226, 226, 226);
+    private final Color backgroundColor = new Color(34, 34, 34);
+    private final Color sidePanelColor = new Color(24, 24, 24);
+    private final Color topPanelColor = new Color(45, 45, 45);
+    private final Color accentColor = new Color(0, 120, 215);
+    private final Color textColor = Color.WHITE;
 
-
+    private Font modernFont = new Font("Segoe UI", Font.PLAIN, 14);
     private final int SIDE_PANEL_FRACTION = 5;
 
-
+    private JLabel dynamicTitle;
+    private JLabel upcomingLabel;
+    private JTextArea upcomingTasks;
+    private JButton timerBtn;
+    private JPanel sidePanel;
+    private JPanel topPanel;
 
     public GUI() {
         login = new Login("users.txt");
@@ -43,58 +51,60 @@ public class GUI extends JFrame {
         loginPanel.setBackground(backgroundColor);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
-        int fontSize = 14;
 
-        // TITLE
         JLabel title = new JLabel("Study Planner");
-        title.setFont(new Font("Century Gothic", Font.BOLD, 28));
+        title.setFont(new Font("Segoe UI", Font.BOLD, 28));
+        title.setForeground(textColor);
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
         loginPanel.add(title, gbc);
 
-        // USERNAME
         gbc.gridwidth = 1;
         gbc.gridy++;
         gbc.anchor = GridBagConstraints.EAST;
-        loginPanel.add(new JLabel("Username:"), gbc);
+        JLabel userLabel = new JLabel("Username:");
+        userLabel.setForeground(textColor);
+        userLabel.setFont(modernFont);
+        loginPanel.add(userLabel, gbc);
 
         textUsername = new JTextField(15);
+        styleField(textUsername);
         gbc.gridx = 1;
         gbc.anchor = GridBagConstraints.WEST;
         loginPanel.add(textUsername, gbc);
 
-        // PASSWORD
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.anchor = GridBagConstraints.EAST;
-        loginPanel.add(new JLabel("Password:"), gbc);
+        JLabel passLabel = new JLabel("Password:");
+        passLabel.setForeground(textColor);
+        passLabel.setFont(modernFont);
+        loginPanel.add(passLabel, gbc);
 
         textPassword = new JPasswordField(15);
         char defaultEchoChar = textPassword.getEchoChar();
+        styleField(textPassword);
         gbc.gridx = 1;
         gbc.anchor = GridBagConstraints.WEST;
         loginPanel.add(textPassword, gbc);
 
-        // SHOW PASSWORD CHECKBOX
         JCheckBox showPassword = new JCheckBox("Show Password");
-        showPassword.setFont(new Font("Arial", Font.BOLD, fontSize));
+        showPassword.setFont(modernFont);
         showPassword.setFocusable(false);
         showPassword.setBackground(backgroundColor);
+        showPassword.setForeground(textColor);
         showPassword.addActionListener(e -> {
             textPassword.setEchoChar(showPassword.isSelected() ? (char) 0 : defaultEchoChar);
         });
-
         gbc.gridx = 1;
         gbc.gridy++;
         gbc.anchor = GridBagConstraints.WEST;
         loginPanel.add(showPassword, gbc);
 
-        // LOGIN BUTTON
-        JButton loginButton = new JButton("Log in");
-        // SIGN UP BUTTON
-        JButton signupButton = new JButton("Sign up");
+        JButton loginButton = createStyledButton("Log in", accentColor);
+        JButton signupButton = createStyledButton("Sign up", new Color(60, 60, 60));
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
         buttonPanel.setBackground(backgroundColor);
@@ -107,7 +117,6 @@ public class GUI extends JFrame {
         gbc.anchor = GridBagConstraints.CENTER;
         loginPanel.add(buttonPanel, gbc);
 
-        // LOGIN ACTION
         loginButton.addActionListener(e -> {
             String username = textUsername.getText().trim();
             String password = new String(textPassword.getPassword()).trim();
@@ -121,7 +130,6 @@ public class GUI extends JFrame {
             }
         });
 
-        // SIGNUP ACTION
         signupButton.addActionListener(e -> {
             String username = textUsername.getText().trim();
             String password = new String(textPassword.getPassword()).trim();
@@ -137,107 +145,161 @@ public class GUI extends JFrame {
         });
     }
 
+    public void updateUpcomingTasksDisplay(TaskCalendar taskCalendar, int daysAhead) {
+        ArrayList<String[]> upcoming = taskCalendar.getUpcomingTasks(daysAhead);
+        if (upcoming.isEmpty()) {
+            upcomingTasks.setText("No upcoming tasks in the next " + daysAhead + " days.");
+            return;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for (String[] task : upcoming) {
+            // task format: [userID, date, taskType, taskInfo]
+            String date = task[1];
+            String type = task[2];
+            String info = task[3];
+            sb.append("• ").append(date).append(" - ").append(type).append(": ").append(info).append("\n");
+        }
+        upcomingTasks.setText(sb.toString());
+    }
+
+
     private void openMainMenu(int userID) {
         LocalDate currentDate = LocalDate.now();
-        int currentDay = currentDate.getDayOfMonth();
         int currentMonth = currentDate.getMonthValue();
         int currentYear = currentDate.getYear();
 
-        TaskCalendar tc = new TaskCalendar(userID, currentDay, currentMonth, currentYear, "tasks.txt");
+        TaskCalendar tc = new TaskCalendar(userID, currentMonth, currentYear, "tasks.txt");
         JPanel calendarPanel = tc.getCalendarPanel();
 
-        JLabel title = new JLabel(currentDate.getMonth() + " " + currentYear);
-        title.setFont(new Font("Century Gothic", Font.BOLD, 24));
-        title.setHorizontalAlignment(SwingConstants.CENTER);
+        dynamicTitle = new JLabel(currentDate.getMonth() + " " + currentYear);
+        dynamicTitle.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        dynamicTitle.setForeground(textColor);
+        dynamicTitle.setHorizontalAlignment(SwingConstants.CENTER);
 
-        JButton logoutButton = getjButton();
+        JButton logoutButton = getLogoutButton();
 
-        // TOP PANEL
-        JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.setBackground(Color.WHITE);
+        topPanel = new JPanel(new BorderLayout());
         topPanel.setBackground(topPanelColor);
-        topPanel.add(title, BorderLayout.CENTER);
+        topPanel.add(dynamicTitle, BorderLayout.CENTER);
         topPanel.add(logoutButton, BorderLayout.EAST);
 
-        // SIDE PANEL
-        JPanel sidePanel = new JPanel();
+        sidePanel = new JPanel();
         sidePanel.setLayout(new BoxLayout(sidePanel, BoxLayout.Y_AXIS));
         sidePanel.setBackground(sidePanelColor);
-        //sidePanel.setMinimumSize(new Dimension(150, 0));
-        //sidePanel.setPreferredSize(new Dimension(getWidth() / SIDE_PANEL_FRACTION, 1));
 
-        // TIMER BUTTON
-        JButton timerBtn = new JButton("Study timer");
-        timerBtn.setFocusable(false);
+        timerBtn = createStyledButton("Study Timer", new Color(50, 50, 50));
         timerBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
-        timerBtn.setBackground(Color.lightGray);
-        timerBtn.setMaximumSize(new Dimension(Integer.MAX_VALUE, timerBtn.getPreferredSize().height));
 
-        // Wrap button in panel with padding
-        JPanel timerWrapper = new JPanel();
-        timerWrapper.setLayout(new BorderLayout());
+        JPanel timerWrapper = new JPanel(new BorderLayout());
         timerWrapper.setBackground(sidePanelColor);
-        timerWrapper.setBorder(BorderFactory.createEmptyBorder(10, 10, 30, 10));
+        timerWrapper.setBorder(new EmptyBorder(10, 10, 10, 10));
         timerWrapper.add(timerBtn, BorderLayout.CENTER);
-        timerWrapper.setMaximumSize(new Dimension(Integer.MAX_VALUE, timerWrapper.getPreferredSize().height));
 
+// Create the panel container
+        JPanel upcomingWrapper = new JPanel(new BorderLayout());
+        upcomingWrapper.setBackground(sidePanelColor);
+        upcomingWrapper.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+// Label for the tab
+        upcomingLabel = new JLabel("Upcoming Tasks");
+        upcomingLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        upcomingLabel.setForeground(textColor);
+        upcomingWrapper.add(upcomingLabel, BorderLayout.NORTH);
+
+// Text area for tasks (initially empty, will update right after)
+        upcomingTasks = new JTextArea();
+        upcomingTasks.setFont(modernFont);
+        upcomingTasks.setEditable(false);
+        upcomingTasks.setBackground(new Color(40, 40, 40));
+        upcomingTasks.setForeground(textColor);
+        upcomingTasks.setLineWrap(true);
+        upcomingTasks.setWrapStyleWord(true);
+        upcomingWrapper.add(upcomingTasks, BorderLayout.CENTER);
+
+// Add it to the side panel
         sidePanel.add(timerWrapper);
-        sidePanel.add(Box.createVerticalStrut(15));
+        sidePanel.add(Box.createVerticalStrut(10));
+        sidePanel.add(upcomingWrapper);
+
+// --- Now update the text area with upcoming tasks ---
+// Example: show tasks within the next 7 days
+        updateUpcomingTasksDisplay(tc, 7);
 
 
-        // MAIN CONTENT PANEL
         JPanel mainContent = new JPanel(new BorderLayout());
         mainContent.setBackground(backgroundColor);
         mainContent.add(topPanel, BorderLayout.NORTH);
         mainContent.add(calendarPanel, BorderLayout.CENTER);
         mainContent.add(sidePanel, BorderLayout.WEST);
 
-        // Resize behavior
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
-                int newWidth = getWidth() / SIDE_PANEL_FRACTION;
-                sidePanel.setPreferredSize(new Dimension(newWidth, getHeight()));
-                sidePanel.revalidate();
+                int width = getWidth();
+                int newSideWidth = width / SIDE_PANEL_FRACTION;
+                sidePanel.setPreferredSize(new Dimension(newSideWidth, getHeight()));
+
+                float scale = Math.max(12f, width / 60f);
+                Font scaledFont = modernFont.deriveFont(scale);
+                Font scaledBold = scaledFont.deriveFont(Font.BOLD);
+
+                dynamicTitle.setFont(scaledBold.deriveFont(scale + 10f));
+                upcomingLabel.setFont(scaledBold);
+                upcomingTasks.setFont(scaledFont);
+                timerBtn.setFont(scaledFont);
+
+                SwingUtilities.updateComponentTreeUI(GUI.this);
             }
         });
 
-
         add(mainContent, "main");
         cardLayout.show(getContentPane(), "main");
+
+        dispatchEvent(new ComponentEvent(this, ComponentEvent.COMPONENT_RESIZED)); // trigger resize for font init
     }
 
+    private void styleField(JTextField field) {
+        field.setFont(modernFont);
+        field.setBackground(new Color(50, 50, 50));
+        field.setForeground(Color.WHITE);
+        field.setCaretColor(Color.WHITE);
+        field.setBorder(BorderFactory.createLineBorder(new Color(80, 80, 80)));
+    }
 
-    private JButton getjButton() {
-        JButton logoutButton = new JButton("Log Out");
-        logoutButton.setFont(new Font("Century Gothic", Font.BOLD, 12));
-        logoutButton.setFocusable(false);
-        logoutButton.setBackground(new Color(220, 53, 69)); // Soft red (like Bootstrap's danger)
-        logoutButton.setForeground(Color.WHITE);            // White text
-        logoutButton.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(200, 0, 0), 1), // Thin red border
-                BorderFactory.createEmptyBorder(5, 15, 5, 15)            // Padding inside
-        ));
-        logoutButton.setCursor(new Cursor(Cursor.HAND_CURSOR));      // Hand cursor on hover
+    private JButton createStyledButton(String text, Color bgColor) {
+        JButton button = new JButton(text);
+        button.setFont(modernFont);
+        button.setBackground(bgColor);
+        button.setForeground(Color.WHITE);
+        button.setFocusPainted(false);
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        return button;
+    }
+
+    private JButton getLogoutButton() {
+        JButton logoutButton = createStyledButton("Log Out", new Color(178, 34, 34));
+        logoutButton.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        logoutButton.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
 
         logoutButton.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                logoutButton.setBackground(new Color(200, 40, 55)); // Darker red on hover
+                logoutButton.setBackground(new Color(150, 30, 30));
             }
 
             @Override
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                logoutButton.setBackground(new Color(220, 53, 69)); // Original red
+                logoutButton.setBackground(new Color(178, 34, 34));
             }
         });
 
-        // Clear username and password fields, return to login screen
         logoutButton.addActionListener(e -> {
             textPassword.setText("");
             textUsername.setText("");
             cardLayout.show(getContentPane(), "login");
         });
+
         return logoutButton;
     }
 }

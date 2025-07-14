@@ -1,15 +1,14 @@
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.*;
+import java.awt.event.*;
 import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.border.Border;
-import java.awt.*;
 
 public class TaskCalendar {
     int userID;
-    int day;
     int month;
     int year;
     Database taskFile;
@@ -19,34 +18,25 @@ public class TaskCalendar {
     int currentMonth = today.getMonthValue();
     int currentYear = today.getYear();
 
-    // COLOURS
-    String RESET = "\u001B[0m";
-    String DARK_RED = "\033[0;31m";
-    String GREEN = "\u001B[32m";
-    String YELLOW = "\u001B[33m";
-    String CYAN = "\033[0;36m";
-    String LIGHT_GRAY = "\033[0;37m"; // Light Gray (Bright White)
-    String BOLD = "\033[1m";
+    JPanel calendarPanel;
 
+    // Store references to day buttons for resizing fonts
+    java.util.List<JButton> dayButtons = new ArrayList<>();
+    java.util.List<JLabel> dayLabels = new ArrayList<>();
 
-
-
-    public TaskCalendar(int userID, int day, int month, int year, String filename) {
+    public TaskCalendar(int userID, int month, int year, String filename) {
         this.userID = userID;
-        this.day = day;
         this.month = month;
         this.year = year;
         this.taskFile = new Database(filename);
     }
-
-
 
     public ArrayList<ArrayList<Integer>> createCalendar() {
         ArrayList<ArrayList<Integer>> calendar = new ArrayList<>();
 
         LocalDate firstDay = LocalDate.of(year, month, 1);
         int daysInMonth = firstDay.lengthOfMonth();
-        int startDay = firstDay.getDayOfWeek().getValue(); // 1 (Mon) to 7 (Sun)
+        int startDay = firstDay.getDayOfWeek().getValue(); // Monday=1 ... Sunday=7
 
         int day = 1;
         for (int week = 0; week < 6; week++) {
@@ -67,36 +57,108 @@ public class TaskCalendar {
     }
 
     public JPanel getCalendarPanel() {
-        ArrayList<ArrayList<Integer>> calendar = createCalendar();
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(7, 7)); // 7 columns for Mon–Sun
-        panel.setBackground(Color.white);
+        calendarPanel = new JPanel(new GridLayout(7, 7));
+        calendarPanel.setBackground(new Color(34, 34, 34)); // dark background
+
+        dayButtons.clear();
+        dayLabels.clear();
 
         String[] days = { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
         for (String d : days) {
-            panel.add(new JLabel(d, SwingConstants.CENTER));
+            JLabel label = new JLabel(d, SwingConstants.CENTER);
+            label.setForeground(Color.LIGHT_GRAY);
+            label.setFont(new Font("Segoe UI", Font.BOLD, 16));
+            calendarPanel.add(label);
+            dayLabels.add(label);
         }
 
+        ArrayList<ArrayList<Integer>> calendar = createCalendar();
         for (ArrayList<Integer> week : calendar) {
             for (Integer day : week) {
                 if (day == null) {
-                    panel.add(new JLabel(""));
+                    JLabel emptyLabel = new JLabel("");
+                    calendarPanel.add(emptyLabel);
                 } else {
                     JButton button = getButton(day);
-                    panel.add(button);
+                    calendarPanel.add(button);
+                    dayButtons.add(button);
                 }
             }
         }
 
-        return panel;
+        // Add resize listener to adjust fonts dynamically
+        calendarPanel.addComponentListener(new ComponentAdapter() {
+            public void componentResized(ComponentEvent e) {
+                resizeFonts();
+            }
+        });
+
+        return calendarPanel;
     }
 
-    private boolean hasTask(LocalDate taskDate) {
+    private void resizeFonts() {
+        // Use panel height to estimate a good font size
+        int height = calendarPanel.getHeight();
+        if (height == 0) return; // Not yet visible
+
+        // Header labels: bigger font
+        int headerFontSize = Math.max(12, height / 25);
+        Font headerFont = new Font("Segoe UI", Font.BOLD, headerFontSize);
+        for (JLabel label : dayLabels) {
+            label.setFont(headerFont);
+        }
+
+        // Day buttons: slightly smaller font
+        int buttonFontSize = Math.max(10, height / 35);
+        Font buttonFont = new Font("Segoe UI", Font.PLAIN, buttonFontSize);
+        for (JButton button : dayButtons) {
+            button.setFont(buttonFont);
+        }
+    }
+
+    private void refreshCalendar() {
+        calendarPanel.removeAll();
+        calendarPanel.setLayout(new GridLayout(7, 7));
+        calendarPanel.setBackground(new Color(34, 34, 34)); // dark background
+
+        dayButtons.clear();
+        dayLabels.clear();
+
+        String[] days = { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
+        for (String d : days) {
+            JLabel label = new JLabel(d, SwingConstants.CENTER);
+            label.setForeground(Color.LIGHT_GRAY);
+            label.setFont(new Font("Segoe UI", Font.BOLD, 16));
+            calendarPanel.add(label);
+            dayLabels.add(label);
+        }
+
+        ArrayList<ArrayList<Integer>> calendar = createCalendar();
+        for (ArrayList<Integer> week : calendar) {
+            for (Integer day : week) {
+                if (day == null) {
+                    JLabel emptyLabel = new JLabel("");
+                    calendarPanel.add(emptyLabel);
+                } else {
+                    JButton button = getButton(day);
+                    calendarPanel.add(button);
+                    dayButtons.add(button);
+                }
+            }
+        }
+
+        calendarPanel.revalidate();
+        calendarPanel.repaint();
+
+        resizeFonts();
+    }
+
+    private boolean hasTask(LocalDate date) {
         ArrayList<String> records = taskFile.readAllRecords();
         if (records != null) {
             for (String record : records) {
-                String[] taskDetails = record.split(" ; "); // userID ; date ; type ; info
-                if (taskDetails[0].equals(String.valueOf(userID)) && taskDetails[1].equals(taskDate.toString())) {
+                String[] parts = record.split(" ; ");
+                if (parts.length >= 2 && parts[0].equals(String.valueOf(userID)) && parts[1].equals(date.toString())) {
                     return true;
                 }
             }
@@ -104,83 +166,77 @@ public class TaskCalendar {
         return false;
     }
 
-    private ArrayList<String[]> getTasksOnDate(LocalDate taskDate) {
+    private ArrayList<String[]> getTasksOnDate(LocalDate date) {
         ArrayList<String[]> tasks = new ArrayList<>();
         ArrayList<String> records = taskFile.readAllRecords();
 
         if (records != null) {
             for (String record : records) {
-                String[] taskDetails = record.split(" ; "); // userID ; date ; type ; info
-                if (taskDetails[0].equals(String.valueOf(userID)) &&
-                        taskDetails[1].equals(taskDate.toString())) {
-                    tasks.add(taskDetails); // Add entire task entry
+                String[] parts = record.split(" ; ");
+                if (parts.length >= 4 && parts[0].equals(String.valueOf(userID)) && parts[1].equals(date.toString())) {
+                    tasks.add(parts);
                 }
             }
         }
-        return tasks; // May be empty if no tasks found
+        return tasks;
     }
 
-
     private JButton getButton(Integer day) {
-        // Define your default day button color
-        Color defaultDayColor = new Color(224, 230, 255); // Light grey default
-        Color currentDayColor = new Color(171, 197, 255); // Soft blue for today
-        Color taskDayColor = new Color(180, 240, 200);    // Soft green for task days
+        Color defaultDayColor = new Color(50, 50, 50);
+        Color taskDayColor = new Color(70, 110, 80);
 
-         // Create button for the day
         JButton button = new JButton(day.toString());
-
-        button.setHorizontalAlignment(SwingConstants.LEFT);   // Top-left alignment
+        button.setHorizontalAlignment(SwingConstants.LEFT);
         button.setVerticalAlignment(SwingConstants.TOP);
         button.setFocusable(false);
+        button.setForeground(Color.WHITE);
+        button.setOpaque(true);
+        button.setBorderPainted(true);
 
-        getTasksOnDate(LocalDate.of(currentYear, currentMonth, day));
+        boolean isToday = (day == currentDay && currentMonth == month && currentYear == year);
+        boolean hasTask = hasTask(LocalDate.of(year, month, day));
 
-        Border hoverBorder = BorderFactory.createLineBorder(Color.DARK_GRAY, 2);
-        Border defaultBorder = null;
-
-        if (day == currentDay && currentMonth == month && currentYear == year) {
-            button.setBackground(currentDayColor);
-            defaultBorder = hoverBorder;
-        } else if (hasTask(LocalDate.of(currentYear, currentMonth, day))) {
+        // Set background color
+        if (hasTask) {
             button.setBackground(taskDayColor);
-            defaultBorder = BorderFactory.createEmptyBorder();
         } else {
-            defaultBorder = BorderFactory.createEmptyBorder();
             button.setBackground(defaultDayColor);
         }
 
-        Color originalColor = button.getBackground();
-        Color hoverColor = originalColor.darker(); // Darker tint for hover
-        button.setBorder(defaultBorder);
-        button.setBackground(originalColor);
+        // Border logic
+        Border defaultBorder;
+        if (isToday) {
+            defaultBorder = BorderFactory.createLineBorder(Color.WHITE, 3);
+        } else {
+            defaultBorder = BorderFactory.createEmptyBorder(3, 3, 3, 3);
+        }
 
-        // Add hover effect (color + border)
+        button.setBorder(defaultBorder);
+
+        // Hover effects
+        Color originalColor = button.getBackground();
+        Color hoverColor = originalColor.brighter();
+        Border hoverBorder = BorderFactory.createLineBorder(Color.GRAY, 2);
         Border finalDefaultBorder = defaultBorder;
+
         button.addMouseListener(new MouseAdapter() {
-            @Override
             public void mouseEntered(MouseEvent e) {
                 button.setBackground(hoverColor);
                 button.setBorder(hoverBorder);
                 button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             }
 
-            @Override
             public void mouseExited(MouseEvent e) {
                 button.setBackground(originalColor);
                 button.setBorder(finalDefaultBorder);
             }
         });
 
-
         LocalDate selectedDate = LocalDate.of(year, month, day);
-        button.addActionListener(e -> {
-            System.out.println("Clicked day: " + day);
-            openTaskCreation(selectedDate);
-        });
+        button.addActionListener(e -> openTaskCreation(selectedDate));
+
         return button;
     }
-
 
 
     private String formatDate(LocalDate date) {
@@ -198,139 +254,187 @@ public class TaskCalendar {
             }
         }
 
-        String month = date.getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
+        String monthName = date.getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
         int year = date.getYear();
-        return day + suffix + " " + month + " " + year;
+        return day + suffix + " " + monthName + " " + year;
     }
-
-
 
     private void openTaskCreation(LocalDate date) {
         JDialog dialog = new JDialog();
         dialog.setTitle("Create Task for " + formatDate(date));
         dialog.setModal(true);
-        dialog.setSize(400, 300);
+        dialog.setSize(450, 400);
         dialog.setLocationRelativeTo(null);
-        dialog.setLayout(new BorderLayout());
 
-        // Panel for inputs
+        // Use BorderLayout with padding around main panel
+        JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        mainPanel.setBackground(new Color(34, 34, 34)); // dark background
+
+        // Header panel for title
+        JLabel titleLabel = new JLabel("Task Creation");
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        titleLabel.setForeground(Color.WHITE);
+        titleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+        mainPanel.add(titleLabel, BorderLayout.NORTH);
+
+        // Center panel with all inputs stacked vertically
         JPanel inputPanel = new JPanel();
         inputPanel.setLayout(new BoxLayout(inputPanel, BoxLayout.Y_AXIS));
-        inputPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        inputPanel.setBackground(new Color(34, 34, 34));
 
+        // Date label
         JLabel dateLabel = new JLabel("Date: " + formatDate(date));
+        dateLabel.setForeground(Color.LIGHT_GRAY);
         dateLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         inputPanel.add(dateLabel);
-
         inputPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 
-        JLabel typeLabel = new JLabel("Task Type:");
-        typeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        inputPanel.add(typeLabel);
-
-        String[] taskTypes = { "Academic", "Social & Personal", "Health & Wellbeing" };
-        JComboBox<String> typeComboBox = new JComboBox<>(taskTypes);
-        typeComboBox.setAlignmentX(Component.LEFT_ALIGNMENT);
-        inputPanel.add(typeComboBox);
-
-        inputPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-
+        // Existing tasks (if any)
         ArrayList<String[]> loggedTasks = getTasksOnDate(date);
-        System.out.println(Arrays.toString(loggedTasks.get(0)));
-        JLabel loggedTasksLabel = new JLabel("Tasks");
-        System.out.println(getTasksOnDate(date).toString());
-        loggedTasksLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        inputPanel.add(loggedTasksLabel);
+        if (!loggedTasks.isEmpty()) {
+            JLabel existingLabel = new JLabel("Existing Tasks (tick to complete):");
+            existingLabel.setForeground(Color.LIGHT_GRAY);
+            existingLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            existingLabel.setFocusable(false);
+            inputPanel.add(existingLabel);
+            inputPanel.add(Box.createRigidArea(new Dimension(0, 5)));
 
-        JLabel infoLabel = new JLabel("Task Info:");
-        infoLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        inputPanel.add(infoLabel);
+            JPanel tasksCheckboxPanel = new JPanel();
+            tasksCheckboxPanel.setLayout(new BoxLayout(tasksCheckboxPanel, BoxLayout.Y_AXIS));
+            tasksCheckboxPanel.setBackground(new Color(34, 34, 34));
+            tasksCheckboxPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JTextArea infoTextArea = new JTextArea(5, 30);
-        JScrollPane scrollPane = new JScrollPane(infoTextArea);
+            for (int i = 0; i < loggedTasks.size(); i++) {
+                String[] task = loggedTasks.get(i);
+                String taskType = task[2];
+                String taskInfo = task[3];
+                JCheckBox taskCheckBox = new JCheckBox(taskType + ": " + taskInfo);
+                taskCheckBox.setForeground(Color.WHITE);
+                taskCheckBox.setBackground(new Color(34, 34, 34));
+                taskCheckBox.setAlignmentX(Component.LEFT_ALIGNMENT);
+                tasksCheckboxPanel.add(taskCheckBox);
+
+                int recordIndex = findRecordIndex(task);
+                taskCheckBox.addActionListener(e -> {
+                    if (taskCheckBox.isSelected() && recordIndex != -1) {
+                        taskFile.removeRecord(recordIndex);
+                        tasksCheckboxPanel.remove(taskCheckBox);
+                        tasksCheckboxPanel.revalidate();
+                        tasksCheckboxPanel.repaint();
+                        refreshCalendar();
+                    }
+                });
+            }
+            inputPanel.add(tasksCheckboxPanel);
+        } else {
+            JLabel noTasksLabel = new JLabel("No tasks for this day.");
+            noTasksLabel.setForeground(Color.LIGHT_GRAY);
+            noTasksLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            inputPanel.add(noTasksLabel);
+        }
+        inputPanel.add(Box.createRigidArea(new Dimension(0, 15)));
+
+        // Task type label + dropdown
+        JLabel taskTypeLabel = new JLabel("Task Type:");
+        taskTypeLabel.setForeground(Color.LIGHT_GRAY);
+        taskTypeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        inputPanel.add(taskTypeLabel);
+
+        String[] taskTypes = { "Work & Productivity", "Health & Wellbeing", "Social & Leisure" };
+        JComboBox<String> taskTypeCombo = new JComboBox<>(taskTypes);
+        taskTypeCombo.setAlignmentX(Component.LEFT_ALIGNMENT);
+        inputPanel.add(taskTypeCombo);
+        inputPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        // Task info label + textarea
+        JLabel taskInfoLabel = new JLabel("Task Information:");
+        taskInfoLabel.setForeground(Color.LIGHT_GRAY);
+        taskInfoLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        inputPanel.add(taskInfoLabel);
+
+        JTextArea taskInfoArea = new JTextArea(4, 20);
+        taskInfoArea.setLineWrap(true);
+        taskInfoArea.setWrapStyleWord(true);
+        taskInfoArea.setBackground(new Color(50, 50, 50));
+        taskInfoArea.setForeground(Color.WHITE);
+        taskInfoArea.setCaretColor(Color.WHITE);
+        JScrollPane scrollPane = new JScrollPane(taskInfoArea);
         scrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
+        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(80, 80, 80)));
         inputPanel.add(scrollPane);
+        inputPanel.add(Box.createRigidArea(new Dimension(0, 15)));
 
-        dialog.add(inputPanel, BorderLayout.CENTER);
-
-        // SAVE TASK BUTTON
-        JPanel buttonPanel = new JPanel();
+        // Save button
         JButton saveButton = new JButton("Save Task");
-        buttonPanel.add(saveButton);
-        dialog.add(buttonPanel, BorderLayout.SOUTH);
+        saveButton.setBackground(new Color(60, 120, 60));
+        saveButton.setForeground(Color.WHITE);
+        saveButton.setFocusPainted(false);
+        saveButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+        saveButton.setPreferredSize(new Dimension(100, 30));
 
         saveButton.addActionListener(e -> {
-            String taskType = (String) typeComboBox.getSelectedItem();
-            String taskInfo = infoTextArea.getText().trim();
+            String taskType = (String) taskTypeCombo.getSelectedItem();
+            String taskInfo = taskInfoArea.getText().trim();
 
             if (taskInfo.isEmpty()) {
-                JOptionPane.showMessageDialog(dialog, "Task info cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(dialog, "Please enter task information.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            saveTask(userID, date, taskType, taskInfo);
-            JOptionPane.showMessageDialog(dialog, "Task saved successfully!");
+            String newRecord = userID + " ; " + date.toString() + " ; " + taskType + " ; " + taskInfo;
+            taskFile.addRecord(newRecord);
             dialog.dispose();
+            refreshCalendar();
         });
 
+        inputPanel.add(saveButton);
+
+        mainPanel.add(inputPanel, BorderLayout.CENTER);
+
+        dialog.setContentPane(mainPanel);
         dialog.setVisible(true);
     }
 
+    public ArrayList<String[]> getUpcomingTasks(int daysAhead) {
+        ArrayList<String[]> upcomingTasks = new ArrayList<>();
+        LocalDate startDate = LocalDate.now();  // today
+        LocalDate endDate = startDate.plusDays(daysAhead);  // today + daysAhead
 
-
-    public void viewTask() {
         ArrayList<String> records = taskFile.readAllRecords();
-        ArrayList<String> tasks = new ArrayList<>();
         if (records != null) {
             for (String record : records) {
-                String[] taskDetails = record.split(" ; "); // userID ; date ; type ; info
-                if (taskDetails[0].equals(String.valueOf(userID))) {
-                    tasks.add(record);
-                    System.out.print(GREEN + "Task date: " + RESET + taskDetails[1] + " ");
-                    System.out.print(GREEN + "Task type: " + RESET + taskDetails[2] + " ");
-                    System.out.println(GREEN + "Task info: " + RESET + taskDetails[3] + " ");
-
+                String[] parts = record.split(" ; ");
+                if (parts.length >= 4 && parts[0].equals(String.valueOf(userID))) {
+                    LocalDate taskDate;
+                    try {
+                        taskDate = LocalDate.parse(parts[1]);
+                    } catch (Exception e) {
+                        continue; // skip malformed dates
+                    }
+                    // If taskDate is within startDate and endDate inclusive
+                    if (!taskDate.isBefore(startDate) && !taskDate.isAfter(endDate)) {
+                        upcomingTasks.add(parts);
+                    }
                 }
-
-            }
-            if (tasks.isEmpty() ) {
-                System.out.println(DARK_RED + "No tasks found." + RESET);
             }
         }
+        return upcomingTasks;
     }
 
 
 
 
 
-    // Save the task to the file
-    public void saveTask(int userID, LocalDate taskDate, String type, String info) {
-        String taskData = userID + " ; " + taskDate.toString() + " ; " + type + " ; " + info; // format it
-        taskFile.addRecord(taskData);  // store in the text file
-        System.out.println(GREEN + "Task saved successfully!" + RESET);
-    }
-
-
-
-
-    // Navigate to the previous month
-    public void prevMonth() {
-        if (month == 1) {
-            month = 12;
-            year--;
-        } else {
-            month--;
+    private int findRecordIndex(String[] recordParts) {
+        ArrayList<String> records = taskFile.readAllRecords();
+        if (records != null) {
+            for (int i = 0; i < records.size(); i++) {
+                if (records.get(i).equals(String.join(" ; ", recordParts))) {
+                    return i;
+                }
+            }
         }
+        return -1;
     }
-
-    // Navigate to the next month
-    public void nextMonth() {
-        if (month == 12) {
-            month = 1;
-            year++;
-        } else {
-            month++;
-        }
-    }
-
 }

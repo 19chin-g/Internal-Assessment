@@ -12,6 +12,8 @@ public class TaskCalendar {
     int month;
     int year;
     Database taskFile;
+    private JPanel upcomingTasksPanel;
+
 
     LocalDate today = LocalDate.now();
     int currentDay = today.getDayOfMonth();
@@ -30,6 +32,11 @@ public class TaskCalendar {
         this.year = year;
         this.taskFile = new Database(filename);
     }
+
+    public void setUpcomingTasksPanel(JPanel panel) {
+        this.upcomingTasksPanel = panel;
+    }
+
 
     public ArrayList<ArrayList<Integer>> createCalendar() {
         ArrayList<ArrayList<Integer>> calendar = new ArrayList<>();
@@ -116,7 +123,7 @@ public class TaskCalendar {
         }
     }
 
-    private void refreshCalendar() {
+    public void refreshCalendar() {
         calendarPanel.removeAll();
         calendarPanel.setLayout(new GridLayout(7, 7));
         calendarPanel.setBackground(new Color(34, 34, 34)); // dark background
@@ -152,6 +159,38 @@ public class TaskCalendar {
 
         resizeFonts();
     }
+
+    public void refreshSidePanel(JPanel upcomingTasksPanel) {
+        upcomingTasksPanel.removeAll();
+
+        ArrayList<String[]> upcoming = getUpcomingTasks(10); // e.g., next 10 tasks
+        if (upcoming.isEmpty()) {
+            JLabel noTasksLabel = new JLabel("No upcoming tasks.");
+            noTasksLabel.setForeground(Color.LIGHT_GRAY);
+            noTasksLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+            upcomingTasksPanel.add(noTasksLabel);
+        } else {
+            for (String[] task : upcoming) {
+                String date = task[1];
+                String type = task[2];
+                String info = task[3];
+
+                JLabel taskLabel = new JLabel("• " + date + " - " + type + ": " + info);
+                taskLabel.setForeground(Color.WHITE);
+                taskLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+                upcomingTasksPanel.add(taskLabel);
+            }
+        }
+
+        upcomingTasksPanel.revalidate();
+        upcomingTasksPanel.repaint();
+    }
+
+    public void refreshAll(JPanel upcomingTasksPanel) {
+        refreshCalendar();
+        refreshSidePanel(upcomingTasksPanel);
+    }
+
 
     private boolean hasTask(LocalDate date) {
         ArrayList<String> records = taskFile.readAllRecords();
@@ -324,6 +363,7 @@ public class TaskCalendar {
                         tasksCheckboxPanel.revalidate();
                         tasksCheckboxPanel.repaint();
                         refreshCalendar();
+
                     }
                 });
             }
@@ -377,6 +417,10 @@ public class TaskCalendar {
         saveButton.addActionListener(e -> {
             String taskType = (String) taskTypeCombo.getSelectedItem();
             String taskInfo = taskInfoArea.getText().trim();
+            if (upcomingTasksPanel != null) {
+                refreshAll(upcomingTasksPanel);
+            }
+
 
             if (taskInfo.isEmpty()) {
                 JOptionPane.showMessageDialog(dialog, "Please enter task information.", "Error", JOptionPane.ERROR_MESSAGE);

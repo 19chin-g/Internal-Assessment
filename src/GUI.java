@@ -20,7 +20,7 @@ public class GUI extends JFrame {
     private final Color textColor = Color.WHITE;
 
     private Font modernFont = new Font("Segoe UI", Font.PLAIN, 14);
-    private final int SIDE_PANEL_FRACTION = 5;
+    private final int SIDE_PANEL_FRACTION = 4;
 
     private JLabel dynamicTitle;
     private JLabel upcomingLabel;
@@ -190,12 +190,31 @@ public class GUI extends JFrame {
 
         timerBtn = createStyledButton("Study Timer", new Color(50, 50, 50));
         timerBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        timerBtn.addActionListener(e -> {
+            if (timerBtn.isSelected()) {
+                JDialog dialog = new JDialog();
+                dialog.setTitle("Study Timer");
+                dialog.setModal(true);
+                dialog.setSize(450, 400);
+                dialog.setLocationRelativeTo(null);;
+            }
+        });
 
         JPanel timerWrapper = new JPanel(new BorderLayout());
         timerWrapper.setBackground(sidePanelColor);
         timerWrapper.setBorder(new EmptyBorder(10, 10, 10, 10));
         timerWrapper.add(timerBtn, BorderLayout.CENTER);
+// Header panel for title
+        // Use BorderLayout with padding around main panel
+        JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        mainPanel.setBackground(new Color(34, 34, 34)); // dark background
 
+        JLabel titleLabel = new JLabel("Task Creation");
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        titleLabel.setForeground(Color.WHITE);
+        titleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+        mainPanel.add(titleLabel, BorderLayout.NORTH);
 // Create the panel container
         JPanel upcomingWrapper = new JPanel(new BorderLayout());
         upcomingWrapper.setBackground(sidePanelColor);
@@ -217,14 +236,14 @@ public class GUI extends JFrame {
         upcomingTasks.setWrapStyleWord(true);
         upcomingWrapper.add(upcomingTasks, BorderLayout.CENTER);
 
-// Add it to the side panel
+        // Add it to the side panel
         sidePanel.add(timerWrapper);
         sidePanel.add(Box.createVerticalStrut(10));
         sidePanel.add(upcomingWrapper);
 
-// --- Now update the text area with upcoming tasks ---
-// Example: show tasks within the next 7 days
-        updateUpcomingTasksDisplay(tc, 7);
+        // --- Now update the text area with upcoming tasks ---
+        // Example: show tasks within the next 7 days
+        updateUpcomingTasksDisplay(tc, 14);
 
 
         JPanel mainContent = new JPanel(new BorderLayout());
@@ -240,7 +259,7 @@ public class GUI extends JFrame {
                 int newSideWidth = width / SIDE_PANEL_FRACTION;
                 sidePanel.setPreferredSize(new Dimension(newSideWidth, getHeight()));
 
-                float scale = Math.max(12f, width / 60f);
+                float scale = Math.max(8f, width / 70f);
                 Font scaledFont = modernFont.deriveFont(scale);
                 Font scaledBold = scaledFont.deriveFont(Font.BOLD);
 

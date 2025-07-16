@@ -313,6 +313,7 @@ public class TaskCalendar {
                 taskCheckBox.setForeground(Color.WHITE);
                 taskCheckBox.setBackground(new Color(34, 34, 34));
                 taskCheckBox.setAlignmentX(Component.LEFT_ALIGNMENT);
+                taskCheckBox.setFocusable(false);
                 tasksCheckboxPanel.add(taskCheckBox);
 
                 int recordIndex = findRecordIndex(task);

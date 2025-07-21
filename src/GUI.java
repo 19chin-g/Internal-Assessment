@@ -6,7 +6,6 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.LocalDate;
-import java.util.ArrayList;
 
 public class GUI extends JFrame {
     private JTextField textUsername;
@@ -141,30 +140,15 @@ public class GUI extends JFrame {
         });
     }
 
-    public void updateUpcomingTasksDisplay(TaskCalendar calendar, int daysAhead) {
-        ArrayList<String[]> upcoming = calendar.getUpcomingTasks(daysAhead);
-        StringBuilder sb = new StringBuilder();
-
-        if (upcoming.isEmpty()) {
-            sb.append("No upcoming tasks in the next ").append(daysAhead).append(" days.");
-        } else {
-            for (String[] task : upcoming) {
-                sb.append("• ").append(task[1]).append(" - ").append(task[2]).append(": ").append(task[3]).append("\n");
-            }
-        }
-
-        upcomingTasks.setText(sb.toString());
+    public void updateUpcomingTasksDisplay(TaskCalendar calendar) {
+        calendar.refreshAll(); // updates calendar + upcoming tasks
     }
 
-    public void refreshUI() {
-        updateUpcomingTasksDisplay(taskCalendar, 14);
-    }
+
 
     private void openMainMenu(int userID) {
         LocalDate now = LocalDate.now();
         taskCalendar = new TaskCalendar(userID, now.getMonthValue(), now.getYear(), "tasks.txt");
-        taskCalendar.setGuiReference(this); // 🔁 Allow TaskCalendar to call refreshUI()
-
         calendarPanel = taskCalendar.getCalendarPanel();
 
         dynamicTitle = new JLabel(now.getMonth() + " " + now.getYear(), SwingConstants.CENTER);
@@ -202,17 +186,31 @@ public class GUI extends JFrame {
         upcomingTasks.setLineWrap(true);
         upcomingTasks.setWrapStyleWord(true);
 
+        // Make it scrollable
+        JScrollPane upcomingScrollPane = new JScrollPane(upcomingTasks);
+        upcomingScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        upcomingScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        upcomingScrollPane.setBorder(null); // optional, keep sleek look
+        upcomingScrollPane.getVerticalScrollBar().setUnitIncrement(10); // smoother scrolling
+
+
+
+        // Wrap it in a panel with fixed height
         JPanel upcomingWrapper = new JPanel(new BorderLayout());
         upcomingWrapper.setBackground(sidePanelColor);
         upcomingWrapper.setBorder(new EmptyBorder(10, 10, 10, 10));
         upcomingWrapper.add(upcomingLabel, BorderLayout.NORTH);
-        upcomingWrapper.add(new JScrollPane(upcomingTasks), BorderLayout.CENTER);
+        upcomingWrapper.add(upcomingScrollPane, BorderLayout.CENTER);
+        upcomingWrapper.setPreferredSize(new Dimension(200, 200)); // height limit
+
+        //  Save text area reference for refresh
+        taskCalendar.setUpcomingTextArea(upcomingTasks);
 
         sidePanel.add(timerWrapper);
         sidePanel.add(Box.createVerticalStrut(10));
         sidePanel.add(upcomingWrapper);
 
-        updateUpcomingTasksDisplay(taskCalendar, 14);
+        updateUpcomingTasksDisplay(taskCalendar);
 
         JPanel mainContent = new JPanel(new BorderLayout());
         mainContent.setBackground(backgroundColor);
@@ -252,20 +250,6 @@ public class GUI extends JFrame {
         field.setBorder(BorderFactory.createLineBorder(new Color(80, 80, 80)));
     }
 
-    public void refreshCalendar(int newMonth, int newYear) {
-        taskCalendar = new TaskCalendar(taskCalendar.userID, newMonth, newYear, "tasks.txt");
-        taskCalendar.setGuiReference(this);
-
-        JPanel newCalendarPanel = taskCalendar.getCalendarPanel();
-        Container contentPane = getContentPane();
-        JPanel mainContent = (JPanel) contentPane.getComponent(1);
-        mainContent.remove(1);
-        mainContent.add(newCalendarPanel, BorderLayout.CENTER);
-
-        updateUpcomingTasksDisplay(taskCalendar, 14);
-        mainContent.revalidate();
-        mainContent.repaint();
-    }
 
     private JButton createStyledButton(String text, Color bgColor) {
         JButton button = new JButton(text);
@@ -276,6 +260,9 @@ public class GUI extends JFrame {
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
         return button;
     }
+
+
+
 
     private JButton getLogoutButton() {
         JButton logoutButton = createStyledButton("Log Out", new Color(178, 34, 34));

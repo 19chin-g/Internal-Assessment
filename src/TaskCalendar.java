@@ -12,7 +12,8 @@ public class TaskCalendar {
     int month;
     int year;
     Database taskFile;
-    private JPanel upcomingTasksPanel;
+    private JTextArea upcomingTasksArea;
+
 
 
     LocalDate today = LocalDate.now();
@@ -33,9 +34,10 @@ public class TaskCalendar {
         this.taskFile = new Database(filename);
     }
 
-    public void setUpcomingTasksPanel(JPanel panel) {
-        this.upcomingTasksPanel = panel;
+    public void setUpcomingTextArea(JTextArea upcomingTasksArea) {
+        this.upcomingTasksArea = upcomingTasksArea;
     }
+
 
 
     public ArrayList<ArrayList<Integer>> createCalendar() {
@@ -160,36 +162,43 @@ public class TaskCalendar {
         resizeFonts();
     }
 
-    public void refreshSidePanel(JPanel upcomingTasksPanel) {
-        upcomingTasksPanel.removeAll();
 
-        ArrayList<String[]> upcoming = getUpcomingTasks(10); // e.g., next 10 tasks
+
+
+    public void refreshSidePanel(JTextArea textArea, int daysAhead) {
+        textArea.removeAll();
+        ArrayList<String[]> upcoming = getUpcomingTasks(daysAhead);
+        StringBuilder sb = new StringBuilder();
+
         if (upcoming.isEmpty()) {
-            JLabel noTasksLabel = new JLabel("No upcoming tasks.");
-            noTasksLabel.setForeground(Color.LIGHT_GRAY);
-            noTasksLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-            upcomingTasksPanel.add(noTasksLabel);
+            sb.append("No upcoming tasks.");
         } else {
             for (String[] task : upcoming) {
-                String date = task[1];
+                LocalDate rawDate = LocalDate.parse(task[1]); // assuming ISO format
+                String formattedDate = formatDate(rawDate);
+
                 String type = task[2];
                 String info = task[3];
 
-                JLabel taskLabel = new JLabel("• " + date + " - " + type + ": " + info);
-                taskLabel.setForeground(Color.WHITE);
-                taskLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-                upcomingTasksPanel.add(taskLabel);
+                sb.append(" • ").append(formattedDate)
+                        .append(" - ").append(type)
+                        .append(": ").append(info).append("\n");
             }
         }
 
-        upcomingTasksPanel.revalidate();
-        upcomingTasksPanel.repaint();
+        textArea.setText(sb.toString());
     }
 
-    public void refreshAll(JPanel upcomingTasksPanel) {
+
+
+
+    public void refreshAll() {
         refreshCalendar();
-        refreshSidePanel(upcomingTasksPanel);
+        if (upcomingTasksArea != null) {
+            refreshSidePanel(upcomingTasksArea, 14); //
+        }
     }
+
 
 
     private boolean hasTask(LocalDate date) {
@@ -222,9 +231,17 @@ public class TaskCalendar {
 
     private JButton getButton(Integer day) {
         Color defaultDayColor = new Color(50, 50, 50);
-        Color taskDayColor = new Color(70, 110, 80);
+        Color futureTaskColor = new Color(70, 110, 80);    // Greenish
+        Color pastTaskColor = new Color(110, 70, 70);      // Reddish
+        Color todayBorderColor = Color.WHITE;
 
-        JButton button = new JButton(day.toString());
+        LocalDate thisDay = LocalDate.of(year, month, day);
+        boolean isToday = thisDay.equals(LocalDate.now());
+        boolean hasTask = hasTask(thisDay);
+        boolean isPast = thisDay.isBefore(LocalDate.now());
+
+// Create button
+        JButton button = new JButton(String.valueOf(day));
         button.setHorizontalAlignment(SwingConstants.LEFT);
         button.setVerticalAlignment(SwingConstants.TOP);
         button.setFocusable(false);
@@ -232,20 +249,20 @@ public class TaskCalendar {
         button.setOpaque(true);
         button.setBorderPainted(true);
 
-        boolean isToday = (day == currentDay && currentMonth == month && currentYear == year);
-        boolean hasTask = hasTask(LocalDate.of(year, month, day));
-
-        // Set background color
+// Background color logic
         if (hasTask) {
-            button.setBackground(taskDayColor);
+            if (isPast) {
+                button.setBackground(pastTaskColor);
+            } else {
+                button.setBackground(futureTaskColor);
+            }
         } else {
             button.setBackground(defaultDayColor);
         }
 
-        // Border logic
         Border defaultBorder;
         if (isToday) {
-            defaultBorder = BorderFactory.createLineBorder(Color.WHITE, 3);
+            defaultBorder = BorderFactory.createLineBorder(todayBorderColor, 3);
         } else {
             defaultBorder = BorderFactory.createEmptyBorder(3, 3, 3, 3);
         }
@@ -329,6 +346,7 @@ public class TaskCalendar {
         inputPanel.add(dateLabel);
         inputPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 
+
         // Existing tasks (if any)
         ArrayList<String[]> loggedTasks = getTasksOnDate(date);
         if (!loggedTasks.isEmpty()) {
@@ -362,7 +380,7 @@ public class TaskCalendar {
                         tasksCheckboxPanel.remove(taskCheckBox);
                         tasksCheckboxPanel.revalidate();
                         tasksCheckboxPanel.repaint();
-                        refreshCalendar();
+                        refreshAll();
 
                     }
                 });
@@ -417,10 +435,6 @@ public class TaskCalendar {
         saveButton.addActionListener(e -> {
             String taskType = (String) taskTypeCombo.getSelectedItem();
             String taskInfo = taskInfoArea.getText().trim();
-            if (upcomingTasksPanel != null) {
-                refreshAll(upcomingTasksPanel);
-            }
-
 
             if (taskInfo.isEmpty()) {
                 JOptionPane.showMessageDialog(dialog, "Please enter task information.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -430,7 +444,7 @@ public class TaskCalendar {
             String newRecord = userID + " ; " + date.toString() + " ; " + taskType + " ; " + taskInfo;
             taskFile.addRecord(newRecord);
             dialog.dispose();
-            refreshCalendar();
+            refreshAll();
         });
 
         inputPanel.add(saveButton);
@@ -480,6 +494,6 @@ public class TaskCalendar {
                 }
             }
         }
-        return -1;
+        return -1; // if task doesn't exist
     }
 }

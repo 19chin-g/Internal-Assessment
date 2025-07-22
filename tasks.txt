@@ -4,4 +4,3 @@ ads
 d
 as
 2 ; 2025-07-23 ; Work & Productivity ; Finish comp sci IA
-2 ; 2025-07-21 ; Work & Productivity ; a

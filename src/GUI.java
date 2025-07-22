@@ -15,11 +15,12 @@ public class GUI extends JFrame {
     private final Login login;
     private TaskCalendar taskCalendar;
 
-    private final Color backgroundColor = new Color(34, 34, 34);
-    private final Color sidePanelColor = new Color(24, 24, 24);
-    private final Color topPanelColor = new Color(45, 45, 45);
-    private final Color accentColor = new Color(0, 120, 215);
-    private final Color textColor = Color.WHITE;
+    public final Color backgroundColor = new Color(34, 34, 34);
+    public final Color sidePanelColor = new Color(24, 24, 24);
+    public final Color topPanelColor = new Color(45, 45, 45);
+    public final Color accentColor = new Color(0, 120, 215);
+    public final Color textColor = Color.WHITE;
+
 
     private Font modernFont = new Font("Segoe UI", Font.PLAIN, 14);
     private final int SIDE_PANEL_FRACTION = 4;
@@ -167,6 +168,10 @@ public class GUI extends JFrame {
         sidePanel.setBackground(sidePanelColor);
 
         timerBtn = createStyledButton("Study Timer", new Color(50, 50, 50));
+        timerBtn.addActionListener(e -> {
+            new StudyTimer();
+        });
+
         timerBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JPanel timerWrapper = new JPanel(new BorderLayout());
@@ -284,3 +289,5 @@ public class GUI extends JFrame {
         return logoutButton;
     }
 }
+
+

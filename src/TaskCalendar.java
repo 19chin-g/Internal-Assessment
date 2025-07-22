@@ -355,6 +355,7 @@ public class TaskCalendar {
             existingLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
             existingLabel.setFocusable(false);
             inputPanel.add(existingLabel);
+            inputPanel.setBackground(new Color(53, 53, 53));
             inputPanel.add(Box.createRigidArea(new Dimension(0, 5)));
 
             JPanel tasksCheckboxPanel = new JPanel();

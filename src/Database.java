@@ -54,4 +54,63 @@ public class Database {
             System.out.println("Error updating file");
         }
     }
+
+    public void writeAllRecords(ArrayList<String> records) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
+            for (String record : records) {
+                writer.write(record);
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public void sortRecords() {
+        ArrayList<String> records = readAllRecords();
+        if (records == null || records.size() <= 1) return; // no need to sort
+
+        // Bubble sort by full record string, case-insensitive
+        for (int i = 0; i < records.size() - 1; i++) {
+            for (int j = 0; j < records.size() - i - 1; j++) {
+                String record1 = records.get(j);
+                String record2 = records.get(j + 1);
+
+                if (record1.compareToIgnoreCase(record2) > 0) {
+                    // Swap
+                    records.set(j, record2);
+                    records.set(j + 1, record1);
+                }
+            }
+        }
+
+        writeAllRecords(records);
+    }
+
+    public int searchRecord(String target) {
+        ArrayList<String> records = readAllRecords();
+        int low = 0;
+        int high = records.size() - 1;
+
+        while (low <= high) {
+            int mid = (low + high) / 2;
+            String record = records.get(mid);
+
+            int comparison = record.compareToIgnoreCase(target);
+
+            if (comparison == 0) {
+                return mid; // Found exact record
+            } else if (comparison < 0) {
+                low = mid + 1;
+            } else {
+                high = mid - 1;
+            }
+        }
+        return -1; // Not found
+    }
+
+
+
+
 }

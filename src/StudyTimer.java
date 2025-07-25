@@ -49,7 +49,7 @@ public class StudyTimer extends JFrame {
         timerLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         timerLabel.setBorder(new EmptyBorder(20, 0, 10, 0));
 
-        minuteSelector = new JComboBox<>(new Integer[]{1, 20, 25, 30, 45, 60});
+        minuteSelector = new JComboBox<>(new Integer[]{10, 20, 25, 30, 45, 60});
         minuteSelector.setSelectedItem(25);
         minuteSelector.setMaximumSize(new Dimension(120, 35));
         minuteSelector.setBackground(new Color(30, 30, 30));
@@ -193,7 +193,7 @@ public class StudyTimer extends JFrame {
         timeLeft = ((int) minuteSelector.getSelectedItem()) * 60;
         totalTime = timeLeft;
         updateTimerLabel();
-        updateStatus("Reset to selected time.");
+        updateStatus("Timer reset.");
         startButton.setEnabled(true);
         pauseButton.setEnabled(false);
         minuteSelector.setEnabled(true);

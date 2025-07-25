@@ -1,7 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
 import java.time.*;
-import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.*;
 import javax.swing.*;
@@ -21,7 +20,7 @@ public class TaskCalendar {
     int currentMonth = today.getMonthValue();
     int currentYear = today.getYear();
 
-    JPanel calendarPanel;
+    JPanel calendarPanel = null;
 
     // Store references to day buttons for resizing fonts
     java.util.List<JButton> dayButtons = new ArrayList<>();
@@ -66,7 +65,7 @@ public class TaskCalendar {
     }
 
     public JPanel getCalendarPanel() {
-        calendarPanel = new JPanel(new GridLayout(7, 7));
+        calendarPanel.setLayout(new GridLayout(7, 7));
         calendarPanel.setBackground(new Color(34, 34, 34)); // dark background
 
         dayButtons.clear();
@@ -365,6 +364,7 @@ public class TaskCalendar {
 
             for (int i = 0; i < loggedTasks.size(); i++) {
                 String[] task = loggedTasks.get(i);
+                System.out.println(task[2]);
                 String taskType = task[2];
                 String taskInfo = task[3];
                 JCheckBox taskCheckBox = new JCheckBox(taskType + ": " + taskInfo);
@@ -374,7 +374,7 @@ public class TaskCalendar {
                 taskCheckBox.setFocusable(false);
                 tasksCheckboxPanel.add(taskCheckBox);
 
-                int recordIndex = findRecordIndex(task);
+                int recordIndex = findTaskIndex(userID, date, taskType, taskInfo);
                 taskCheckBox.addActionListener(e -> {
                     if (taskCheckBox.isSelected() && recordIndex != -1) {
                         taskFile.removeRecord(recordIndex);
@@ -442,8 +442,7 @@ public class TaskCalendar {
                 return;
             }
 
-            String newRecord = userID + " ; " + date.toString() + " ; " + taskType + " ; " + taskInfo;
-            taskFile.addRecord(newRecord);
+            addTask(userID,  date,  taskType, taskInfo);
             dialog.dispose();
             refreshAll();
         });
@@ -455,6 +454,16 @@ public class TaskCalendar {
         dialog.setContentPane(mainPanel);
         dialog.setVisible(true);
     }
+
+    public void addTask(int userId, LocalDate date, String taskType, String taskInfo) {
+
+        String taskRecord = userId + " ; " + date + " ; " + taskType + " ; " + taskInfo;
+        taskFile.addRecord(taskRecord);
+        // Add to your records list and then sort it
+        taskFile.sortRecords();
+    }
+
+
 
     public ArrayList<String[]> getUpcomingTasks(int daysAhead) {
         ArrayList<String[]> upcomingTasks = new ArrayList<>();
@@ -486,15 +495,13 @@ public class TaskCalendar {
 
 
 
-    private int findRecordIndex(String[] recordParts) {
-        ArrayList<String> records = taskFile.readAllRecords();
-        if (records != null) {
-            for (int i = 0; i < records.size(); i++) {
-                if (records.get(i).equals(String.join(" ; ", recordParts))) {
-                    return i;
-                }
-            }
-        }
-        return -1; // if task doesn't exist
+    private int findTaskIndex(int userId, LocalDate date, String taskType, String taskInfo) {
+        String target = userId + " ; " + date + " ; " + taskType + " ; " + taskInfo;
+        return taskFile.searchRecord(target);
     }
+
+
+
+
+
 }

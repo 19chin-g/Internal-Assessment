@@ -6,6 +6,8 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.LocalDate;
+import java.time.Month;
+
 
 public class GUI extends JFrame {
     // Colours
@@ -24,12 +26,11 @@ public class GUI extends JFrame {
     private JTextField textUsername;
     private JPasswordField textPassword;
     private JTextArea upcomingTasks;
-    private JLabel dynamicTitle, upcomingLabel;
+    private JLabel monthLabel, upcomingLabel;
     private JButton timerBtn;
 
     private final CardLayout cardLayout;
     private final Login login;
-    private TaskCalendar taskCalendar;
 
     public GUI() {
         login = new Login("users.txt");
@@ -133,21 +134,57 @@ public class GUI extends JFrame {
         });
     }
 
+    private void updateMonthLabel(TaskCalendar taskCalendar) {
+        monthLabel.setText(Month.of(taskCalendar.getSelectedMonth()) + " " + taskCalendar.getSelectedYear());
+    }
+
+
     // Opens the main planner interface
     private void setupMainMenu(int userID) {
         LocalDate now = LocalDate.now();
-        taskCalendar = new TaskCalendar(userID, now.getMonthValue(), now.getYear(), "tasks.txt");
+        TaskCalendar taskCalendar = new TaskCalendar(userID, now.getMonthValue(), now.getYear(), "tasks.txt");
         JPanel calendarPanel = taskCalendar.getCalendarPanel();
 
         // Top panel
-        dynamicTitle = new JLabel(now.getMonth() + " " + now.getYear(), SwingConstants.CENTER);
-        dynamicTitle.setFont(new Font("Segoe UI", Font.BOLD, 24));
-        dynamicTitle.setForeground(textColor);
+        monthLabel = new JLabel(now.getMonth() + " " + now.getYear(), SwingConstants.CENTER);
+        monthLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        monthLabel.setForeground(textColor);
 
+        JButton prevMonthBtn = createStyledButton("<", new Color(50, 50, 50));
+        JButton nextMonthBtn = createStyledButton(">", new Color(50, 50, 50));
+
+        prevMonthBtn.addActionListener(e -> {
+            taskCalendar.goToPreviousMonth();
+            taskCalendar.refreshAll();
+            updateMonthLabel(taskCalendar);
+        });
+
+        nextMonthBtn.addActionListener(e -> {
+            taskCalendar.goToNextMonth();
+            taskCalendar.refreshAll();
+            updateMonthLabel(taskCalendar);
+        });
+
+
+        // Top panel
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setBackground(topPanelColor);
-        topPanel.add(dynamicTitle, BorderLayout.CENTER);
-        topPanel.add(getLogoutButton(), BorderLayout.EAST);
+
+        // Month navigation panel (buttons + label)
+        JPanel centerNavPanel = new JPanel(new BorderLayout());
+        centerNavPanel.setOpaque(false);  // match dark theme
+
+        centerNavPanel.add(prevMonthBtn, BorderLayout.WEST);
+        centerNavPanel.add(monthLabel, BorderLayout.CENTER);
+        centerNavPanel.add(nextMonthBtn, BorderLayout.EAST);
+
+        JPanel logoutWrapper = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        logoutWrapper.setOpaque(false);
+        logoutWrapper.add(getLogoutButton());
+
+        topPanel.add(centerNavPanel, BorderLayout.CENTER);
+        topPanel.add(logoutWrapper, BorderLayout.EAST);
+
 
         // Side panel setup
         sidePanel = new JPanel();
@@ -212,7 +249,7 @@ public class GUI extends JFrame {
                 Font scaledFont = modernFont.deriveFont(scale);
                 Font scaledBold = scaledFont.deriveFont(Font.BOLD);
 
-                dynamicTitle.setFont(scaledBold.deriveFont(scale + 10f));
+                monthLabel.setFont(scaledBold.deriveFont(scale + 10f));
                 upcomingLabel.setFont(scaledBold);
                 upcomingTasks.setFont(scaledFont);
                 timerBtn.setFont(scaledFont);

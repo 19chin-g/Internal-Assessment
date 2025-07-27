@@ -1,6 +1,7 @@
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.time.LocalTime;
 
 public class StudyTimer extends JFrame {
     private Timer timer;
@@ -16,7 +17,9 @@ public class StudyTimer extends JFrame {
     private final JButton startButton;
     private final JButton pauseButton;
     private final JButton resetButton;
+    private final JButton endSessionButton;
     private final JLabel statusLabel;
+    private final JLabel nextBreakLabel;
 
     public final Color backgroundColour = new Color(34, 34, 34);
     public final Color btnColour = new Color(0, 120, 215);
@@ -28,7 +31,7 @@ public class StudyTimer extends JFrame {
 
     public StudyTimer() {
         setTitle("Pomodoro Timer");
-        setSize(450, 500);
+        setSize(450, 550);
         setLocationRelativeTo(null);
         setResizable(false);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -66,30 +69,41 @@ public class StudyTimer extends JFrame {
 
         statusLabel = new JLabel("Timer is paused.");
         statusLabel.setFont(labelFont);
-        statusLabel.setForeground(new Color(180, 180, 180));
+        statusLabel.setForeground(new Color(255, 255, 255));
         statusLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        statusLabel.setBorder(new EmptyBorder(15, 0, 15, 0));
+        statusLabel.setBorder(new EmptyBorder(15, 0, 5, 0));
 
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
+        nextBreakLabel = new JLabel("");
+        nextBreakLabel.setFont(labelFont);
+        nextBreakLabel.setForeground(new Color(180, 180, 180));
+        nextBreakLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        nextBreakLabel.setBorder(new EmptyBorder(0, 0, 15, 0));
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 15));
         buttonPanel.setBackground(backgroundColour);
 
         Dimension btnSize = new Dimension(90, 40);
         startButton = createButton("Start");
         pauseButton = createButton("Pause");
         resetButton = createButton("Reset");
+        endSessionButton = createButton("End session");
+
         startButton.setPreferredSize(btnSize);
         pauseButton.setPreferredSize(btnSize);
         resetButton.setPreferredSize(btnSize);
+        endSessionButton.setPreferredSize(new Dimension(180, 40));
 
         buttonPanel.add(startButton);
         buttonPanel.add(pauseButton);
         buttonPanel.add(resetButton);
+        buttonPanel.add(endSessionButton);
 
         mainPanel.add(titleLabel);
         mainPanel.add(selectLabel);
         mainPanel.add(minuteSelector);
         mainPanel.add(timerLabel);
         mainPanel.add(statusLabel);
+        mainPanel.add(nextBreakLabel);
         mainPanel.add(buttonPanel);
         add(mainPanel);
 
@@ -98,6 +112,7 @@ public class StudyTimer extends JFrame {
         totalTime = ((int) minuteSelector.getSelectedItem()) * 60;
         timeLeft = totalTime;
         updateTimerLabel();
+        updateNextBreakLabel();
 
         pauseButton.setEnabled(false);
         setVisible(true);
@@ -125,12 +140,36 @@ public class StudyTimer extends JFrame {
 
         resetButton.addActionListener(e -> resetTimer());
 
+        endSessionButton.addActionListener(e -> {
+            if (timer != null) {
+                timer.stop();
+                timer = null;
+            }
+            if (onBreak) {
+                updateStatus("Break skipped. Back to work.");
+                onBreak = false;
+            } else {
+                pomodoroCount++;
+                onBreak = true;
+                updateStatus("Session skipped. Take a break.");
+            }
+            timeLeft = onBreak ? getBreakLength() : ((int) minuteSelector.getSelectedItem()) * 60;
+            totalTime = timeLeft;
+            updateTimerLabel();
+            updateNextBreakLabel();
+            timer = null;
+            startButton.setEnabled(true);
+            pauseButton.setEnabled(false);
+            minuteSelector.setEnabled(!onBreak);
+        });
+
         minuteSelector.addActionListener(e -> {
             if (!onBreak && (timer == null || isPaused)) {
                 totalTime = ((int) minuteSelector.getSelectedItem()) * 60;
                 timeLeft = totalTime;
                 updateTimerLabel();
                 updateStatus("Duration set to " + (totalTime / 60) + " minutes.");
+                updateNextBreakLabel();
             }
         });
     }
@@ -140,7 +179,7 @@ public class StudyTimer extends JFrame {
         totalTime = onBreak ? getBreakLength() : ((int) minuteSelector.getSelectedItem()) * 60;
         timeLeft = totalTime;
 
-        timer = new Timer(1000, evt -> {
+        timer = new Timer(1, evt -> {
             if (!isPaused) {
                 timeLeft--;
                 updateTimerLabel();
@@ -155,15 +194,22 @@ public class StudyTimer extends JFrame {
                         onBreak = true;
                         updateStatus("Study session over. Break time!");
                     }
-                    JOptionPane.showMessageDialog(this, onBreak ? "Time for a break!" : "Back to work!", "Pomodoro", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(this, onBreak ? "Time for a break!" : "Back to work!", "Study Timer", JOptionPane.INFORMATION_MESSAGE);
+                    timeLeft = onBreak ? getBreakLength() : ((int) minuteSelector.getSelectedItem()) * 60;
+                    totalTime = timeLeft;
+                    updateTimerLabel();
+                    updateNextBreakLabel();
                     timer = null;
-                    startTimer(); // auto-start next phase
+                    startButton.setEnabled(true);
+                    pauseButton.setEnabled(false);
+                    minuteSelector.setEnabled(!onBreak);
                 }
             }
         });
 
         timer.start();
         updateStatus(onBreak ? "Break started." : "Timer started.");
+        updateNextBreakLabel();
         startButton.setEnabled(false);
         pauseButton.setEnabled(true);
         minuteSelector.setEnabled(!onBreak);
@@ -193,6 +239,7 @@ public class StudyTimer extends JFrame {
         timeLeft = ((int) minuteSelector.getSelectedItem()) * 60;
         totalTime = timeLeft;
         updateTimerLabel();
+        updateNextBreakLabel();
         updateStatus("Timer reset.");
         startButton.setEnabled(true);
         pauseButton.setEnabled(false);
@@ -211,5 +258,14 @@ public class StudyTimer extends JFrame {
 
     private void updateStatus(String msg) {
         statusLabel.setText(msg);
+    }
+
+    private void updateNextBreakLabel() {
+        if (!onBreak) {
+            int nextBreak = (pomodoroCount + 1) % 4 == 0 ? 15 : 5;
+            nextBreakLabel.setText("Next break: " + nextBreak + " min");
+        } else {
+            nextBreakLabel.setText("");
+        }
     }
 }

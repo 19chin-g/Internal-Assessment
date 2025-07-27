@@ -20,7 +20,7 @@ public class TaskCalendar {
     int currentMonth = today.getMonthValue();
     int currentYear = today.getYear();
 
-    JPanel calendarPanel = null;
+    JPanel calendarPanel = new JPanel();
 
     // Store references to day buttons for resizing fonts
     java.util.List<JButton> dayButtons = new ArrayList<>();
@@ -37,7 +37,13 @@ public class TaskCalendar {
         this.upcomingTasksArea = upcomingTasksArea;
     }
 
+    public int getSelectedYear() {
+        return year;
+    }
 
+    public int getSelectedMonth() {
+        return month;
+    }
 
     public ArrayList<ArrayList<Integer>> createCalendar() {
         ArrayList<ArrayList<Integer>> calendar = new ArrayList<>();
@@ -63,6 +69,23 @@ public class TaskCalendar {
 
         return calendar;
     }
+
+    public void goToPreviousMonth() {
+        month--;
+        if (month < 1) {
+            month = 12;
+            year--;
+        }
+    }
+
+    public void goToNextMonth() {
+        month++;
+        if (month > 12) {
+            month = 1;
+            year++;
+        }
+    }
+
 
     public JPanel getCalendarPanel() {
         calendarPanel.setLayout(new GridLayout(7, 7));
@@ -173,7 +196,7 @@ public class TaskCalendar {
             sb.append("No upcoming tasks.");
         } else {
             for (String[] task : upcoming) {
-                LocalDate rawDate = LocalDate.parse(task[1]); // assuming ISO format
+                LocalDate rawDate = LocalDate.parse(task[1]);
                 String formattedDate = formatDate(rawDate);
 
                 String type = task[2];
@@ -316,7 +339,7 @@ public class TaskCalendar {
 
     private void openTaskCreation(LocalDate date) {
         JDialog dialog = new JDialog();
-        dialog.setTitle("Create Task for " + formatDate(date));
+        dialog.setTitle("Task Creation");
         dialog.setModal(true);
         dialog.setSize(450, 400);
         dialog.setLocationRelativeTo(null);
@@ -327,7 +350,7 @@ public class TaskCalendar {
         mainPanel.setBackground(new Color(34, 34, 34)); // dark background
 
         // Header panel for title
-        JLabel titleLabel = new JLabel("Task Creation");
+        JLabel titleLabel = new JLabel("Task Creation - " + formatDate(date));
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 20));
         titleLabel.setForeground(Color.WHITE);
         titleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
@@ -338,15 +361,8 @@ public class TaskCalendar {
         inputPanel.setLayout(new BoxLayout(inputPanel, BoxLayout.Y_AXIS));
         inputPanel.setBackground(new Color(34, 34, 34));
 
-        // Date label
-        JLabel dateLabel = new JLabel("Date: " + formatDate(date));
-        dateLabel.setForeground(Color.LIGHT_GRAY);
-        dateLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        inputPanel.add(dateLabel);
-        inputPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 
-
-        // Existing tasks (if any)
+        // Existing tasks
         ArrayList<String[]> loggedTasks = getTasksOnDate(date);
         if (!loggedTasks.isEmpty()) {
             JLabel existingLabel = new JLabel("Existing Tasks (tick to complete):");
@@ -354,7 +370,6 @@ public class TaskCalendar {
             existingLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
             existingLabel.setFocusable(false);
             inputPanel.add(existingLabel);
-            inputPanel.setBackground(new Color(53, 53, 53));
             inputPanel.add(Box.createRigidArea(new Dimension(0, 5)));
 
             JPanel tasksCheckboxPanel = new JPanel();

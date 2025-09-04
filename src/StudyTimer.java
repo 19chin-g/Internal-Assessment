@@ -179,7 +179,7 @@ public class StudyTimer extends JFrame {
         totalTime = onBreak ? getBreakLength() : ((int) minuteSelector.getSelectedItem()) * 60;
         timeLeft = totalTime;
 
-        timer = new Timer(1, evt -> {
+        timer = new Timer(1000, evt -> {
             if (!isPaused) {
                 timeLeft--;
                 updateTimerLabel();

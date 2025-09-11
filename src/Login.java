@@ -4,14 +4,13 @@ import java.util.ArrayList;
 public class Login {
     Database loginFile;
     int userID;
-    String filename;
 
 
     public Login(String filename) {
         loginFile = new Database(filename);
     }
 
-
+    // Checks if user exists in file
     public boolean findUser(String username, String password) {
         ArrayList<String> records = loginFile.readAllRecords();
         userID = 0;
@@ -27,7 +26,7 @@ public class Login {
     }
 
 
-    // check if username is already taken
+    // Check if username is already taken
     public boolean isUserTaken(String username) {
         ArrayList<String> records = loginFile.readAllRecords();
 
@@ -41,7 +40,7 @@ public class Login {
     }
 
 
-    // register a new user
+    // Register a new user
     public void register(String username, String password) {
         User user = new User(username, password);
         loginFile.addRecord(user.toString());  // Append user to the file

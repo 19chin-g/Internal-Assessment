@@ -10,7 +10,7 @@ public class Database {
     }
 
 
-    // read all records from the file and return them as list of strings
+    // Read all records from the file and return them as list of strings
     public ArrayList<String> readAllRecords() {
         ArrayList<String> records = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
@@ -35,7 +35,7 @@ public class Database {
         }
     }
 
-    // remove a specific record  from the file
+    // Remove a specific record from the file
     public void removeRecord(int recordNum) {
         List<String> records = readAllRecords();
         if (recordNum < 0 || recordNum >= records.size()) {
@@ -55,6 +55,7 @@ public class Database {
         }
     }
 
+    // Rewrite file with given records
     public void writeAllRecords(ArrayList<String> records) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
             for (String record : records) {
@@ -66,7 +67,7 @@ public class Database {
         }
     }
 
-
+    // Sorts alphabetically with bubble sort
     public void sortRecords() {
         ArrayList<String> records = readAllRecords();
         if (records == null || records.size() <= 1) return; // no need to sort
@@ -88,6 +89,7 @@ public class Database {
         writeAllRecords(records);
     }
 
+    // Searches with binary search, to find specific user or task
     public int searchRecord(String target) {
         ArrayList<String> records = readAllRecords();
         int low = 0;

@@ -48,7 +48,7 @@ public class GUI extends JFrame {
         setVisible(true);
     }
 
-    // Creates login screen
+    // Creates login screen with responsive resizing
     private void setupLoginPanel() {
         loginPanel = new JPanel(new GridBagLayout());
         loginPanel.setBackground(backgroundColor);
@@ -93,6 +93,7 @@ public class GUI extends JFrame {
         showPassword.setFont(modernFont);
         showPassword.setBackground(backgroundColor);
         showPassword.setForeground(textColor);
+        showPassword.setFocusable(false);
         showPassword.addActionListener(e ->
                 textPassword.setEchoChar(showPassword.isSelected() ? (char) 0 : defaultEcho)
         );
@@ -100,8 +101,8 @@ public class GUI extends JFrame {
         loginPanel.add(showPassword, gbc);
 
         // Login + signup buttons
-        JButton loginButton = createStyledButton("Log in", accentColor);
-        JButton signupButton = createStyledButton("Sign up", new Color(60, 60, 60));
+        JButton loginButton = createButton("Log in", accentColor);
+        JButton signupButton = createButton("Sign up", new Color(60, 60, 60));
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
         buttonPanel.setBackground(backgroundColor);
         buttonPanel.add(loginButton);
@@ -133,7 +134,27 @@ public class GUI extends JFrame {
                 JOptionPane.showMessageDialog(this, "Sign up successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
             }
         });
+
+
+        // Scales UI to window size
+        loginPanel.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                int panelHeight = loginPanel.getHeight();
+
+                // Scale fonts based on panel height (you can adjust the divisors to taste)
+                title.setFont(new Font("Segoe UI", Font.BOLD, Math.max(20, panelHeight / 12)));
+                userLabel.setFont(new Font("Segoe UI", Font.PLAIN, Math.max(12, panelHeight / 30)));
+                passLabel.setFont(new Font("Segoe UI", Font.PLAIN, Math.max(12, panelHeight / 30)));
+                textUsername.setFont(new Font("Segoe UI", Font.PLAIN, Math.max(12, panelHeight / 30)));
+                textPassword.setFont(new Font("Segoe UI", Font.PLAIN, Math.max(12, panelHeight / 30)));
+                showPassword.setFont(new Font("Segoe UI", Font.PLAIN, Math.max(12, panelHeight / 30)));
+                loginButton.setFont(new Font("Segoe UI", Font.BOLD, Math.max(12, panelHeight / 30)));
+                signupButton.setFont(new Font("Segoe UI", Font.BOLD, Math.max(12, panelHeight / 30)));
+            }
+        });
     }
+
 
     // Updates the month label text
     private void updateMonthLabel(TaskCalendar taskCalendar) {
@@ -151,8 +172,8 @@ public class GUI extends JFrame {
         monthLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
         monthLabel.setForeground(textColor);
 
-        JButton prevMonthBtn = createStyledButton("<", new Color(50, 50, 50));
-        JButton nextMonthBtn = createStyledButton(">", new Color(50, 50, 50));
+        JButton prevMonthBtn = createButton("<", new Color(50, 50, 50));
+        JButton nextMonthBtn = createButton(">", new Color(50, 50, 50));
 
         prevMonthBtn.addActionListener(e -> {
             taskCalendar.goToPreviousMonth();
@@ -187,7 +208,7 @@ public class GUI extends JFrame {
         sidePanel.setBackground(sidePanelColor);
 
         // Timer button
-        timerBtn = createStyledButton("Study Timer", new Color(50, 50, 50));
+        timerBtn = createButton("Study Timer", new Color(50, 50, 50));
         timerBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
         timerBtn.addActionListener(e -> new StudyTimer());
 
@@ -267,7 +288,7 @@ public class GUI extends JFrame {
         mainContent.add(calendarPanel, BorderLayout.CENTER);
         mainContent.add(sidePanel, BorderLayout.WEST);
 
-        // For scaling fonts and side panel to screen size
+        // Scale fonts and side panel to window size
         addComponentListener(new ComponentAdapter() {
             public void componentResized(ComponentEvent e) {
                 int width = getWidth();
@@ -303,8 +324,8 @@ public class GUI extends JFrame {
         field.setBorder(BorderFactory.createLineBorder(new Color(80, 80, 80)));
     }
 
-    // Creates a styled button
-    private JButton createStyledButton(String text, Color bgColor) {
+    // Custom button
+    private JButton createButton(String text, Color bgColor) {
         JButton button = new JButton(text);
         button.setFont(modernFont);
         button.setBackground(bgColor);
@@ -314,9 +335,9 @@ public class GUI extends JFrame {
         return button;
     }
 
-    // Creates logout button with hover effect
+    // Logout button hover effect
     private JButton getLogoutButton() {
-        JButton logoutButton = createStyledButton("Log Out", new Color(178, 34, 34));
+        JButton logoutButton = createButton("Log Out", new Color(178, 34, 34));
         logoutButton.setFont(new Font("Segoe UI", Font.BOLD, 12));
         logoutButton.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
 

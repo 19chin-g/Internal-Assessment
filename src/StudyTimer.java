@@ -22,13 +22,13 @@ public class StudyTimer extends JFrame {
     private final JLabel nextBreakLabel;
 
     // Colours and fonts
-    public final Color backgroundColour = new Color(34, 34, 34);
-    public final Color btnColour = new Color(0, 120, 215);
-    public final Color textColor = Color.WHITE;
-    public final Font titleFont = new Font("Segoe UI", Font.BOLD, 33);
-    public final Font timerFont = new Font("Segoe UI", Font.BOLD, 64);
-    public final Font labelFont = new Font("Segoe UI", Font.PLAIN, 16);
-    public final Font buttonFont = new Font("Segoe UI", Font.PLAIN, 18);
+    private final Color backgroundColour = new Color(34, 34, 34);
+    private final Color btnColour = new Color(0, 120, 215);
+    private final Color textColor = Color.WHITE;
+    private final Font titleFont = new Font("Segoe UI", Font.BOLD, 33);
+    private final Font timerFont = new Font("Segoe UI", Font.BOLD, 64);
+    private final Font labelFont = new Font("Segoe UI", Font.PLAIN, 16);
+    private final Font buttonFont = new Font("Segoe UI", Font.PLAIN, 18);
 
     // Sets up the timer window
     public StudyTimer() {

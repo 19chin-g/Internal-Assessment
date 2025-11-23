@@ -2,8 +2,8 @@ import java.util.ArrayList;
 
 
 public class Login {
-    Database loginFile;
-    int userID;
+    private Database loginFile;
+    private int userID;
 
 
     public Login(String filename) {
@@ -27,16 +27,16 @@ public class Login {
 
 
     // Check if username is already taken
-    public boolean isUserTaken(String username) {
+    public boolean isUserTaken(String username,String password) {
         ArrayList<String> records = loginFile.readAllRecords();
 
-        for (String record : records) {
-            String[] userInfo = record.split(" ");
-            if (userInfo[0].equals(username)) {
-                return true;
-            }
+        if (loginFile.searchRecord(username + " " + password) != -1) {
+            return true;
         }
-        return false;
+        else {
+            return false;
+        }
+
     }
 
 

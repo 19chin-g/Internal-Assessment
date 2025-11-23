@@ -10,11 +10,11 @@ import java.time.Month;
 
 public class GUI extends JFrame {
     // Color scheme
-    public final Color backgroundColor = new Color(34, 34, 34);
-    public final Color sidePanelColor = new Color(24, 24, 24);
-    public final Color topPanelColor = new Color(45, 45, 45);
-    public final Color accentColor = new Color(0, 120, 215);
-    public final Color textColor = Color.WHITE;
+    private final Color backgroundColor = new Color(34, 34, 34);
+    private final Color sidePanelColor = new Color(24, 24, 24);
+    private final Color topPanelColor = new Color(45, 45, 45);
+    private final Color accentColor = new Color(0, 120, 215);
+    private final Color textColor = Color.WHITE;
 
     // Fonts and layout
     private final Font modernFont = new Font("Segoe UI", Font.PLAIN, 14);
@@ -125,7 +125,7 @@ public class GUI extends JFrame {
         signupButton.addActionListener(e -> {
             String username = textUsername.getText().trim();
             String password = new String(textPassword.getPassword()).trim();
-            if (login.isUserTaken(username)) {
+            if (login.isUserTaken(username, password)) {
                 JOptionPane.showMessageDialog(this, "Username has been taken!", "Sign up Failed", JOptionPane.ERROR_MESSAGE);
             } else if (username.isBlank() || password.isBlank()) {
                 JOptionPane.showMessageDialog(this, "Enter username and password", "Sign up Failed", JOptionPane.ERROR_MESSAGE);

@@ -89,28 +89,30 @@ public class Database {
         writeAllRecords(records);
     }
 
-    // Searches with binary search, to find specific user or task
+    // Searches with binary search to find specific user or task
     public int searchRecord(String target) {
         ArrayList<String> records = readAllRecords();
-        int low = 0;
-        int high = records.size() - 1;
-
-        while (low <= high) {
-            int mid = (low + high) / 2;
-            String record = records.get(mid);
-
-            int comparison = record.compareToIgnoreCase(target);
-
-            if (comparison == 0) {
-                return mid; // Found exact record
-            } else if (comparison < 0) {
-                low = mid + 1;
-            } else {
-                high = mid - 1;
-            }
-        }
-        return -1; // Not found
+        return binarySearch(records, target, 0, records.size() - 1);
     }
+
+
+    private int binarySearch(ArrayList<String> records, String target, int low, int high) {
+        if (low > high) {
+            return -1; // Not found
+        }
+        int mid = (low + high) / 2;
+        String record = records.get(mid);
+        int comparison = record.compareToIgnoreCase(target);
+
+        if (comparison == 0) {
+            return mid; // Found record
+        } else if (comparison < 0) {
+            return binarySearch(records, target, mid + 1, high); //  right half
+        } else {
+            return binarySearch(records, target, low, mid - 1); //  left half
+        }
+    }
+
 
 
 

@@ -8,15 +8,14 @@ import javax.swing.border.Border;
 
 public class TaskCalendar {
     // User and date tracking
-    int userID;
-    int month;
-    int year;
+    private final int userID;
+    private int month;
+    private int year;
 
-    Database taskFile; // Handles task storage
+    private final Database taskFile; // Handles task storage
     private JTextArea upcomingTasksArea; // Area to show upcoming tasks
     private JTextArea overdueTasksArea; // Area to show overdue tasks
 
-    LocalDate today = LocalDate.now(); // Today's date
     JPanel calendarPanel = new JPanel(); // Main calendar grid
 
     // Store references to day buttons and day labels for resizing fonts dynamically
@@ -49,7 +48,7 @@ public class TaskCalendar {
     }
 
     // Create a 2D ArrayList representing the calendar for the current month
-    public ArrayList<ArrayList<Integer>> createCalendar() {
+    private ArrayList<ArrayList<Integer>> createCalendar() {
         ArrayList<ArrayList<Integer>> calendar = new ArrayList<>();
         LocalDate firstDay = LocalDate.of(year, month, 1);
         int daysInMonth = firstDay.lengthOfMonth();
@@ -211,7 +210,7 @@ public class TaskCalendar {
     }
 
     // Refresh the overdue tasks panel
-    public void refreshOverduePanel(JTextArea textArea) {
+    private void refreshOverduePanel(JTextArea textArea) {
         textArea.removeAll();
         ArrayList<String[]> overdue = getOverdueTasks();
         StringBuilder sb = new StringBuilder();
@@ -466,14 +465,14 @@ public class TaskCalendar {
     }
 
     // Add a new task to the database
-    public void addTask(int userId, LocalDate date, String taskType, String taskInfo) {
+    private void addTask(int userId, LocalDate date, String taskType, String taskInfo) {
         String taskRecord = userId + " ; " + date + " ; " + taskType + " ; " + taskInfo;
         taskFile.addRecord(taskRecord);
         taskFile.sortRecords();
     }
 
     // Retrieve upcoming tasks within N days
-    public ArrayList<String[]> getUpcomingTasks(int daysAhead) {
+    private ArrayList<String[]> getUpcomingTasks(int daysAhead) {
         ArrayList<String[]> upcomingTasks = new ArrayList<>();
         LocalDate startDate = LocalDate.now();
         LocalDate endDate = startDate.plusDays(daysAhead);
@@ -496,7 +495,7 @@ public class TaskCalendar {
     }
 
     // Retrieve overdue tasks
-    public ArrayList<String[]> getOverdueTasks() {
+    private ArrayList<String[]> getOverdueTasks() {
         ArrayList<String[]> overdueTasks = new ArrayList<>();
         LocalDate today = LocalDate.now();
         ArrayList<String> records = taskFile.readAllRecords();

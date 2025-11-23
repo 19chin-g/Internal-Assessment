@@ -23,11 +23,11 @@ public class TaskCalendar {
     java.util.List<JLabel> dayLabels = new ArrayList<>();
 
     // Constructor
-    public TaskCalendar(int userID, int month, int year, String filename) {
+    public TaskCalendar(int userID, int month, int year, Database filename) {
         this.userID = userID;
         this.month = month;
         this.year = year;
-        this.taskFile = new Database(filename); // Initialize task database
+        this.taskFile = filename; // Initialize task database
     }
 
     // Set references to the text areas for updating tasks

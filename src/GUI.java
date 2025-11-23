@@ -164,7 +164,7 @@ public class GUI extends JFrame {
     // Creates the main planner interface
     private void setupMainMenu(int userID) {
         LocalDate now = LocalDate.now();
-        TaskCalendar taskCalendar = new TaskCalendar(userID, now.getMonthValue(), now.getYear(), "tasks.txt");
+        TaskCalendar taskCalendar = new TaskCalendar(userID, now.getMonthValue(), now.getYear(), new Database("tasks.txt"));
         JPanel calendarPanel = taskCalendar.getCalendarPanel();
 
         // === Top panel with month navigation ===

@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
 import java.time.*;
 import java.time.format.TextStyle;
 import java.util.*;
@@ -70,6 +71,11 @@ public class TaskCalendar {
         }
         return calendar;
     }
+
+
+    private boolean tasksLoaded = false; // flag to prevent repeated loading
+
+
 
     // Navigate to previous month
     public void goToPreviousMonth() {

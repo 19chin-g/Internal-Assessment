@@ -1,3 +1,5 @@
+import javax.swing.*;
+import java.io.IOException;
 import java.util.ArrayList;
 
 
@@ -7,8 +9,19 @@ public class Login {
 
 
     public Login(String filename) {
-        loginFile = new Database(filename);
+        try {
+            loginFile = new Database(filename); // Prompt user if file missing
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null,
+                    "Login system unavailable: " + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            loginFile = null; // Disable login if file cant be accessed
+        }
     }
+
+
+
 
     // Checks if user exists in file
     public boolean findUser(String username, String password) {
@@ -28,14 +41,7 @@ public class Login {
 
     // Check if username is already taken
     public boolean isUserTaken(String username,String password) {
-        ArrayList<String> records = loginFile.readAllRecords();
-
-        if (loginFile.searchRecord(username + " " + password) != -1) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return loginFile.searchRecord(username + " " + password) != -1;
 
     }
 
@@ -44,8 +50,7 @@ public class Login {
     public void register(String username, String password) {
         User user = new User(username, password);
         loginFile.addRecord(user.toString());  // Append user to the file
-        ArrayList<String> userList = loginFile.readAllRecords();
-        loginFile.sortRecords(); // you define this in Database class
+        loginFile.sortRecords();
 
     }
 

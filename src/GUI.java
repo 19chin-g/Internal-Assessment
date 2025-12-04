@@ -5,6 +5,8 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.Month;
 
@@ -20,6 +22,7 @@ public class GUI extends JFrame {
     private final Font modernFont = new Font("Segoe UI", Font.PLAIN, 14);
     private final int SIDE_PANEL_FRACTION = 4; // side panel width relative to window
 
+
     private JPanel loginPanel;
     private JPanel sidePanel;
     private JTextField textUsername;
@@ -33,7 +36,7 @@ public class GUI extends JFrame {
     private final Login login;
 
     public GUI() {
-        login = new Login("users.txt");
+
         cardLayout = new CardLayout();
         setLayout(cardLayout);
 
@@ -41,6 +44,10 @@ public class GUI extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(700, 400);
         setLocationRelativeTo(null);
+
+
+        login = new Login("users.txt");
+
 
         setupLoginPanel();
         add(loginPanel, "login");
@@ -125,11 +132,11 @@ public class GUI extends JFrame {
         signupButton.addActionListener(e -> {
             String username = textUsername.getText().trim();
             String password = new String(textPassword.getPassword()).trim();
-            if (login.isUserTaken(username, password)) {
+            if (login.isUserTaken(username, password)) { // same username
                 JOptionPane.showMessageDialog(this, "Username has been taken!", "Sign up Failed", JOptionPane.ERROR_MESSAGE);
-            } else if (username.isBlank() || password.isBlank()) {
+            } else if (username.isBlank() || password.isBlank()) { // blank user or password
                 JOptionPane.showMessageDialog(this, "Enter username and password", "Sign up Failed", JOptionPane.ERROR_MESSAGE);
-            } else {
+            } else { // validation check passed
                 login.register(username, password);
                 JOptionPane.showMessageDialog(this, "Sign up successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
             }
@@ -164,10 +171,25 @@ public class GUI extends JFrame {
     // Creates the main planner interface
     private void setupMainMenu(int userID) {
         LocalDate now = LocalDate.now();
-        TaskCalendar taskCalendar = new TaskCalendar(userID, now.getMonthValue(), now.getYear(), new Database("tasks.txt"));
+        Database taskDatabase = new Database("tasks.txt");
+
+        // Stop setup if database is unavailable
+        if (!taskDatabase.isAvailable()) {
+            JOptionPane.showMessageDialog(
+                    null,
+                    "The database file is unavailable. Main menu cannot be loaded.",
+                    "Database Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+            return;
+        }
+
+        // Initialize TaskCalendar with the database
+        TaskCalendar taskCalendar = new TaskCalendar(userID, now.getMonthValue(), now.getYear(), taskDatabase);
         JPanel calendarPanel = taskCalendar.getCalendarPanel();
 
-        // === Top panel with month navigation ===
+
+        // Top panel with month navigation
         monthLabel = new JLabel(now.getMonth() + " " + now.getYear(), SwingConstants.CENTER);
         monthLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
         monthLabel.setForeground(textColor);
